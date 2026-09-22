@@ -1,0 +1,84 @@
+flowchart TB
+    subgraph ClientAdmin["Browser — admin/agent/owner"]
+        SPASTAFF["Portal SPA<br/>(this folder)<br/>/admin/*, /agent/*, /owner/*"]
+    end
+
+    subgraph ClientGuest["Browser — client"]
+        MKT["Marketing SPA<br/>Book a Stay / Request Experience / Package CTA"]
+        SPACLIENT["Portal SPA<br/>/login, /signup, /client/*"]
+    end
+
+    MKT -->|"redirects with ?redirect=intent"| SPACLIENT
+
+    subgraph Edge["CloudFront + WAF"]
+        CF["CloudFront<br/>SPA fallback 403/404 to index.html<br/>Serves both marketing/dist and portal/dist"]
+    end
+
+    subgraph Static["S3"]
+        S3PORTAL["Portal site bucket<br/>portal/dist/"]
+        S3SITE["Marketing site bucket<br/>marketing/dist/"]
+    end
+
+    subgraph API["API Gateway (HTTP API) — shared with marketing"]
+        APIGW["/v1/*"]
+        AUTHZ["JWT Authorizer<br/>verifies Cognito group claim<br/>per route"]
+    end
+
+    subgraph Auth["Amazon Cognito — single User Pool"]
+        COG["User Pool<br/>groups: admin / owner / agent / client<br/>Pre-token-generation trigger injects role claim"]
+    end
+
+    subgraph Compute["Lambda (SAM) — shared with marketing"]
+        LREQ["requests-fn<br/>enquiries + booking requests<br/>(marketing writes, portal reads)"]
+        LSEARCH["search-fn<br/>availability query"]
+        LADMIN["admin-fn<br/>property/experience/package CRUD<br/>+ booking approval<br/>PRIMARY portal backend"]
+        LICAL["ical-sync-worker<br/>SQS consumer"]
+        LFAN["ical-fanout<br/>schedule to SQS"]
+        LNOTIFY["notify-fn<br/>email + notifications"]
+    end
+
+    subgraph Data["Data — single system of record"]
+        RDS[("RDS PostgreSQL<br/>via RDS Proxy<br/>properties / bookings / booking_requests /<br/>enquiries / users — shared schema")]
+    end
+
+    subgraph Async["Events + Messaging"]
+        EB["EventBridge Scheduler<br/>iCal refresh cron"]
+        SQS["SQS + DLQ"]
+        SNS["SNS<br/>bounce/complaint + fan-out"]
+        SES["SES<br/>transactional email"]
+    end
+
+    KROSS["Krossbooking API<br/>(external)"]
+    ICAL["iCal feeds<br/>(external)"]
+
+    SPASTAFF --> CF
+    SPACLIENT --> CF
+    MKT --> CF
+    CF --> S3PORTAL
+    CF --> S3SITE
+    CF --> APIGW
+    APIGW --> AUTHZ
+    AUTHZ --> COG
+    APIGW --> LREQ
+    APIGW --> LSEARCH
+    APIGW --> LADMIN
+    LREQ --> RDS
+    LSEARCH --> RDS
+    LADMIN --> RDS
+    LREQ --> SNS
+    LNOTIFY --> SES
+    SNS --> LNOTIFY
+    SES --> SNS
+    EB --> LFAN
+    LFAN --> SQS
+    SQS --> LICAL
+    LICAL --> RDS
+    LICAL -.poll.-> ICAL
+    LICAL -.confirm.-> KROSS
+    LADMIN -.confirm.-> KROSS
+
+    %% Role-gated route legend (client-side UX gate only — see Context_Instruction.md §6)
+    SPASTAFF -.->|"RoleRoute allow=[admin]"| LADMIN
+    SPASTAFF -.->|"RoleRoute allow=[owner]"| LADMIN
+    SPASTAFF -.->|"RoleRoute allow=[agent]"| LREQ
+    SPACLIENT -.->|"RoleRoute allow=[client]"| LREQ
