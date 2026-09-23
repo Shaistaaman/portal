@@ -1,5 +1,5 @@
 import {
-  Home,
+  LayoutDashboard,
   Users,
   Building2,
   Briefcase,
@@ -25,7 +25,7 @@ export interface AdminNavItem {
  * re-add them here once those pages are real.
  */
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
-  { icon: Home, label: "Dashboard", href: "/admin/dashboard" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
   { icon: Users, label: "User Management", href: "/admin/user-management" },
   { icon: Building2, label: "Properties", href: "/admin/properties" },
   { icon: Briefcase, label: "Experiences", href: "/admin/experiences" },

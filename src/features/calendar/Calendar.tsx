@@ -46,11 +46,17 @@ function bookingCoversDate(booking: Booking, dateKey: string): boolean {
   return dateKey >= booking.checkIn && dateKey < booking.checkOut;
 }
 
-export default function Calendar({ role }: { role: CalendarRole }) {
+export default function Calendar({
+  role,
+  initialPropertyFilter = "",
+}: {
+  role: CalendarRole;
+  initialPropertyFilter?: string;
+}) {
   const navigate = useNavigate();
   const [view, setView] = useState<"month" | "timeline">("month");
   // "" = all properties; otherwise a single property id.
-  const [propertyFilter, setPropertyFilter] = useState("");
+  const [propertyFilter, setPropertyFilter] = useState(initialPropertyFilter);
 
   const ownedPropertyIds = useMemo(() => {
     if (role === "owner") {
@@ -83,10 +89,26 @@ export default function Calendar({ role }: { role: CalendarRole }) {
     [properties],
   );
 
-  const bookings = useMemo(
-    () => MOCK_BOOKINGS.filter((b) => visibleIds.has(b.propertyId)),
-    [visibleIds],
-  );
+  const bookings = useMemo(() => {
+    const propertyBookings = MOCK_BOOKINGS.filter((b) =>
+      visibleIds.has(b.propertyId),
+    );
+    // For owner, also include bookings they created (even on other properties)
+    if (role === "owner") {
+      const ownerCreatedBookings = MOCK_BOOKINGS.filter(
+        (b) => b.createdByRole === "owner",
+      );
+      // Combine and deduplicate
+      const allBookings = [...propertyBookings, ...ownerCreatedBookings];
+      const seen = new Set<string>();
+      return allBookings.filter((b) => {
+        if (seen.has(b.id)) return false;
+        seen.add(b.id);
+        return true;
+      });
+    }
+    return propertyBookings;
+  }, [visibleIds, role]);
 
   return (
     <div className="w-full">
@@ -278,10 +300,21 @@ function MonthView({
                     <button
                       key={booking.id}
                       type="button"
-                      onClick={() =>
-                        navigate(`/${role}/calendar/${booking.id}/edit`)
-                      }
-                      className={`w-full text-left px-1.5 py-1 rounded text-[10px] leading-tight ${colors.block} cursor-pointer`}
+                      onClick={() => {
+                        // Owner can only edit bookings they created
+                        if (
+                          role === "owner" &&
+                          booking.createdByRole !== "owner"
+                        ) {
+                          return; // Don't navigate
+                        }
+                        navigate(`/${role}/calendar/${booking.id}/edit`);
+                      }}
+                      className={`w-full text-left px-1.5 py-1 rounded text-[10px] leading-tight ${colors.block} ${
+                        role === "owner" && booking.createdByRole !== "owner"
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer"
+                      }`}
                     >
                       <span className="block font-semibold truncate">
                         {booking.propertyName}
@@ -459,14 +492,25 @@ function TimelineView({
                       <button
                         key={booking.id}
                         type="button"
-                        onClick={() =>
-                          navigate(`/${role}/calendar/${booking.id}/edit`)
-                        }
+                        onClick={() => {
+                          // Owner can only edit bookings they created
+                          if (
+                            role === "owner" &&
+                            booking.createdByRole !== "owner"
+                          ) {
+                            return; // Don't navigate
+                          }
+                          navigate(`/${role}/calendar/${booking.id}/edit`);
+                        }}
                         style={{
                           left: firstVisible * DAY_COL_WIDTH + 4,
                           width: visibleNights * DAY_COL_WIDTH - 8,
                         }}
-                        className={`absolute top-1/2 -translate-y-1/2 h-8 px-3 rounded-full flex items-center justify-between gap-2 text-[11px] font-medium ${colors.block} cursor-pointer overflow-hidden`}
+                        className={`absolute top-1/2 -translate-y-1/2 h-8 px-3 rounded-full flex items-center justify-between gap-2 text-[11px] font-medium ${colors.block} ${
+                          role === "owner" && booking.createdByRole !== "owner"
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer"
+                        } overflow-hidden`}
                       >
                         <span className="truncate">
                           {startsInWindow ? label : `… ${label}`}

@@ -330,6 +330,34 @@ export const MOCK_PROPERTIES: Property[] = [
     isFeatured: false,
     icalUrls: [],
   },
+  {
+    id: "13",
+    name: "Portofino Harbor Villa",
+    location: "Portofino, Liguria",
+    description:
+      "A charming colorful villa with direct access to the harbor, featuring a private beach entrance.",
+    status: "rejected",
+    propertyType: "villa",
+    managementLevel: "full-service",
+    bedrooms: 4,
+    bathrooms: 3,
+    areaSqm: 310,
+    floorNumber: "",
+    listingUrl: "",
+    images: [
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: ["Private Beach Access", "Panoramic Sea View"],
+    benefits: ["Luxury positioning"],
+    ownerId: "2",
+    ownerName: "Giulia Romano",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
+    rejectionReason:
+      "Property documentation incomplete. Please provide insurance certificates and utility bills for the past 6 months. After submission, we will prioritize review.",
+    isFeatured: false,
+    icalUrls: [],
+  },
 ];
 
 export function findMockPropertyById(id: string): Property | undefined {
@@ -352,6 +380,7 @@ const NIGHTLY_RATES: Record<string, number> = {
   "10": 1550,
   "11": 690,
   "12": 1750,
+  "13": 1300,
 };
 
 export function nightlyRateFor(propertyId: string): number {

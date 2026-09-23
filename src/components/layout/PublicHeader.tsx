@@ -2,27 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import LanguageSelector from "./LanguageSelector";
 import NavLinks from "./NavLinks";
-import type { Language } from "@/lib/types";
-
-const TRANSLATIONS = {
-  en: {
-    lang: "Eng",
-    bookYourStay: "Book Your Stay",
-  },
-  it: {
-    lang: "Ita",
-    bookYourStay: "Prenota il Soggiorno",
-  },
-};
 
 export default function PublicHeader() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-  const [language, setLanguage] = useState<Language>("en");
-
-  const translation = TRANSLATIONS[language];
 
   const handleNavigate = () => {
     setIsSidebarOpen(false);
@@ -75,27 +58,7 @@ export default function PublicHeader() {
             <NavLinks variant="desktop" onNavigate={handleNavigate} />
 
             {/* Right Controls (desktop) */}
-            <div className="hidden lg:flex items-center h-full">
-              <LanguageSelector
-                theme="light"
-                language={language}
-                setLanguage={setLanguage}
-                isOpen={isLanguageOpen}
-                setIsOpen={setIsLanguageOpen}
-                label={translation.lang}
-                buttonId="lang-selector-btn-light"
-              />
-
-              <button
-                id="book-your-stay-btn-light"
-                onClick={() => {
-                  setIsSidebarOpen(false);
-                }}
-                className="h-20 px-5 sm:px-8 border-l border-neutral-200 flex items-center justify-center font-sans font-semibold tracking-widest text-xs sm:text-sm uppercase cursor-pointer hover:bg-neutral-900 hover:text-white transition-all duration-350 select-none text-neutral-900 whitespace-nowrap"
-              >
-                {translation.bookYourStay}
-              </button>
-            </div>
+            <div className="hidden lg:flex items-center h-full"></div>
 
             {/* Mobile / Tablet: Close menu button */}
             <div className="lg:hidden flex items-center h-full">
@@ -117,44 +80,7 @@ export default function PublicHeader() {
             <div className="h-[1px] bg-neutral-200 w-full my-6" />
 
             <div className="space-y-5">
-              {/* Language Selector (pill style inside drawer) */}
-              <div className="flex items-center justify-between">
-                <span className="font-sans text-xs tracking-widest uppercase text-neutral-400 font-medium">
-                  Language
-                </span>
-                <div className="flex border border-neutral-200 rounded-none overflow-hidden bg-white">
-                  <button
-                    onClick={() => setLanguage("en")}
-                    className={`px-4 py-1.5 text-xs font-sans tracking-wider font-semibold transition-all ${
-                      language === "en"
-                        ? "bg-neutral-900 text-white"
-                        : "text-neutral-600 hover:bg-neutral-50"
-                    }`}
-                  >
-                    ENGLISH
-                  </button>
-                  <button
-                    onClick={() => setLanguage("it")}
-                    className={`px-4 py-1.5 text-xs font-sans tracking-wider font-semibold transition-all ${
-                      language === "it"
-                        ? "bg-neutral-900 text-white"
-                        : "text-neutral-600 hover:bg-neutral-50"
-                    }`}
-                  >
-                    ITALIANO
-                  </button>
-                </div>
-              </div>
-
-              {/* Book Your Stay */}
-              <button
-                onClick={() => {
-                  setIsSidebarOpen(false);
-                }}
-                className="w-full py-4 bg-neutral-900 hover:bg-black text-white font-sans font-semibold tracking-widest text-xs sm:text-sm uppercase rounded-none transition-all duration-300 shadow-md active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>{translation.bookYourStay}</span>
-              </button>
+              {/* NavLinks already included above */}
             </div>
           </div>
         </motion.header>
@@ -187,17 +113,7 @@ export default function PublicHeader() {
             </Link>
 
             {/* Right Controls */}
-            <div className="hidden lg:flex items-center h-full z-10">
-              <LanguageSelector
-                theme="light"
-                language={language}
-                setLanguage={setLanguage}
-                isOpen={isLanguageOpen}
-                setIsOpen={setIsLanguageOpen}
-                label={translation.lang}
-                buttonId="lang-selector-btn"
-              />
-            </div>
+            <div className="hidden lg:flex items-center h-full z-10"></div>
           </div>
         </header>
       )}

@@ -1,23 +1,28 @@
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Menu, ChevronLeft, LogOut, Bell } from "lucide-react";
+import {
+  Menu,
+  ChevronLeft,
+  LogOut,
+  Bell,
+  LayoutDashboard,
+  Building2,
+  Calendar,
+  DollarSign,
+  Settings,
+  type LucideIcon,
+} from "lucide-react";
 import { useAuth } from "@/auth/useAuth";
 import MobileMenu from "@/components/layout/admin/MobileMenu";
 import NotificationPopup from "@/components/layout/admin/NotificationPopup";
 import ProfileMenu from "@/components/layout/admin/ProfileMenu";
 import WhatsAppFloatingButton from "@/components/ui/WhatsAppFloatingButton";
-import {
-  ADMIN_NAV_ITEMS,
-  ADMIN_SETTINGS_ITEM,
-} from "@/components/layout/admin/admin-nav";
 
 /**
- * Admin shell: collapsible sidebar + header, wrapping every /admin/* route
- * via <Outlet/>. Ported from apps/portal/app/admin/layout.tsx (Next.js
- * reference). usePathname()/next/link/next/navigation are replaced with
- * react-router-dom's useLocation/NavLink/useNavigate.
+ * Owner layout: collapsible sidebar + header, wrapping every /owner/* route
+ * via <Outlet/>. Mirrors AdminLayout structure but with owner-specific nav items.
  */
-export default function AdminLayout() {
+export default function OwnerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
@@ -29,7 +34,7 @@ export default function AdminLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/admin/login");
+    navigate("/owner/login");
   };
 
   const isActive = (href: string) => location.pathname === href;
@@ -52,6 +57,25 @@ export default function AdminLayout() {
     setMobileMenuOpen((open) => !open);
   };
 
+  interface OwnerNavItem {
+    icon: LucideIcon;
+    label: string;
+    href: string;
+  }
+
+  // Owner nav items using lucide icons (same approach as Admin)
+  const OWNER_NAV_ITEMS: OwnerNavItem[] = [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/owner/dashboard" },
+    { icon: Building2, label: "Properties", href: "/owner/properties" },
+    { icon: Calendar, label: "Calendar", href: "/owner/calendar" },
+    { icon: DollarSign, label: "Financial", href: "/owner/financial" },
+  ];
+
+  const getPageTitle = () => {
+    const item = OWNER_NAV_ITEMS.find((i) => isActive(i.href));
+    return item?.label || "Dashboard";
+  };
+
   return (
     <div className="min-h-screen flex bg-white">
       {/* Sidebar */}
@@ -63,7 +87,7 @@ export default function AdminLayout() {
         <div className="h-20 border-b border-neutral-200 flex items-center justify-between px-4">
           {sidebarOpen && (
             <span className="text-xl font-serif font-bold text-black truncate">
-              SkyLife Admin
+              SkyLife Owner
             </span>
           )}
           <button
@@ -81,7 +105,7 @@ export default function AdminLayout() {
         </div>
 
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {ADMIN_NAV_ITEMS.map((item) => {
+          {OWNER_NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
             return (
@@ -111,22 +135,20 @@ export default function AdminLayout() {
 
         <div className="border-t border-neutral-200 p-3 space-y-1">
           <a
-            href={ADMIN_SETTINGS_ITEM.href}
+            href="/owner/settings"
             onClick={(e) => {
               e.preventDefault();
-              navigate(ADMIN_SETTINGS_ITEM.href);
+              navigate("/owner/settings");
             }}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-              isActive(ADMIN_SETTINGS_ITEM.href)
+              isActive("/owner/settings")
                 ? "bg-black text-white"
                 : "text-neutral-700 hover:bg-neutral-100"
             }`}
           >
-            <ADMIN_SETTINGS_ITEM.icon
+            <Settings
               className={`w-5 h-5 shrink-0 ${
-                isActive(ADMIN_SETTINGS_ITEM.href)
-                  ? "text-white"
-                  : "text-neutral-500"
+                isActive("/owner/settings") ? "text-white" : "text-neutral-500"
               }`}
             />
             {sidebarOpen && <span className="truncate">Settings</span>}
@@ -146,8 +168,7 @@ export default function AdminLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-20 border-b border-neutral-200 flex items-center justify-between px-8 shrink-0">
           <h1 className="text-2xl font-semibold text-neutral-950">
-            {ADMIN_NAV_ITEMS.find((item) => isActive(item.href))?.label ??
-              "Dashboard"}
+            {getPageTitle()}
           </h1>
 
           <div className="flex items-center gap-6">
@@ -162,7 +183,10 @@ export default function AdminLayout() {
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
               </button>
               {notificationOpen && (
-                <NotificationPopup onClose={() => setNotificationOpen(false)} />
+                <NotificationPopup
+                  onClose={() => setNotificationOpen(false)}
+                  role="owner"
+                />
               )}
             </div>
 
@@ -174,7 +198,7 @@ export default function AdminLayout() {
                 className="cursor-pointer"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=256&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=256&auto=format&fit=crop"
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover border border-neutral-200"
                 />
@@ -183,6 +207,7 @@ export default function AdminLayout() {
                 <ProfileMenu
                   onClose={() => setProfileOpen(false)}
                   onLogout={handleLogout}
+                  role="owner"
                 />
               )}
             </div>

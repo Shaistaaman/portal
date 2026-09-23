@@ -8,7 +8,9 @@ import OwnerLoginPage from "@/pages/auth/OwnerLoginPage";
 import PlaceholderPage from "@/pages/PlaceholderPage";
 import RoleRoute from "@/routes/RoleRoute";
 import AdminLayout from "@/layouts/AdminLayout";
+import OwnerLayout from "@/layouts/OwnerLayout";
 import DashboardPage from "@/pages/admin/DashboardPage";
+import OwnerDashboardPage from "@/pages/owner/DashboardPage";
 import UserListPage from "@/pages/admin/user-management/UserListPage";
 import AddUserPage from "@/pages/admin/user-management/AddUserPage";
 import EditUserPage from "@/pages/admin/user-management/EditUserPage";
@@ -40,7 +42,15 @@ import {
 import OwnerPropertiesPage from "@/pages/owner/PropertiesPage";
 import OwnerAddPropertyPage from "@/pages/owner/AddPropertyPage";
 import OwnerEditPropertyPage from "@/pages/owner/EditPropertyPage";
+import OwnerFinancialPage from "@/pages/owner/FinancialPage";
+import OwnerNotificationsPage from "@/pages/owner/NotificationsPage";
 import AgentPropertiesPage from "@/pages/agent/PropertiesPage";
+import AgentDashboardPage from "@/pages/agent/DashboardPage";
+import AgentSettingsPage from "@/pages/agent/SettingsPage";
+import AgentNotificationsPage from "@/pages/agent/NotificationsPage";
+import AgentFinancialPage from "@/pages/agent/FinancialPage";
+import AgentLayout from "@/layouts/AgentLayout";
+import ClientNotificationsPage from "@/pages/client/NotificationsPage";
 
 function App() {
   return (
@@ -65,6 +75,14 @@ function App() {
             element={
               <RoleRoute allow={["client"]}>
                 <RoleSettingsPage role="client" />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/client/notifications"
+            element={
+              <RoleRoute allow={["client"]}>
+                <ClientNotificationsPage />
               </RoleRoute>
             }
           />
@@ -137,119 +155,72 @@ function App() {
 
           <Route path="/agent/login" element={<AgentLoginPage />} />
           <Route
-            path="/agent/dashboard"
+            path="/agent"
             element={
               <RoleRoute allow={["agent"]}>
-                <PlaceholderPage title="Agent Dashboard" fullScreen />
+                <AgentLayout />
               </RoleRoute>
             }
-          />
-          <Route
-            path="/agent/properties"
-            element={
-              <RoleRoute allow={["agent"]}>
-                <AgentPropertiesPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/agent/calendar"
-            element={
-              <RoleRoute allow={["agent"]}>
-                <RoleCalendarPage role="agent" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/agent/calendar/add-booking"
-            element={
-              <RoleRoute allow={["agent"]}>
-                <StandaloneAddBookingPage role="agent" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/agent/calendar/:id/edit"
-            element={
-              <RoleRoute allow={["agent"]}>
-                <StandaloneEditBookingPage role="agent" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/agent/settings"
-            element={
-              <RoleRoute allow={["agent"]}>
-                <RoleSettingsPage role="agent" />
-              </RoleRoute>
-            }
-          />
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AgentDashboardPage />} />
+            <Route path="properties" element={<AgentPropertiesPage />} />
+            <Route
+              path="calendar"
+              element={<RoleCalendarPage role="agent" />}
+            />
+            <Route
+              path="calendar/add-booking"
+              element={<StandaloneAddBookingPage role="agent" />}
+            />
+            <Route
+              path="calendar/:id/edit"
+              element={<StandaloneEditBookingPage role="agent" />}
+            />
+            <Route path="financial" element={<AgentFinancialPage />} />
+            <Route path="settings" element={<AgentSettingsPage />} />
+            <Route path="notifications" element={<AgentNotificationsPage />} />
+          </Route>
 
           <Route path="/owner/login" element={<OwnerLoginPage />} />
           <Route
-            path="/owner/dashboard"
+            path="/owner"
             element={
               <RoleRoute allow={["owner"]}>
-                <PlaceholderPage title="Owner Dashboard" fullScreen />
+                <OwnerLayout />
               </RoleRoute>
             }
-          />
-          <Route
-            path="/owner/properties"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <OwnerPropertiesPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/owner/properties/add-property"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <OwnerAddPropertyPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/owner/properties/:id/edit"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <OwnerEditPropertyPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/owner/calendar"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <RoleCalendarPage role="owner" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/owner/calendar/add-booking"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <StandaloneAddBookingPage role="owner" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/owner/calendar/:id/edit"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <StandaloneEditBookingPage role="owner" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/owner/settings"
-            element={
-              <RoleRoute allow={["owner"]}>
-                <RoleSettingsPage role="owner" />
-              </RoleRoute>
-            }
-          />
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<OwnerDashboardPage />} />
+            <Route path="properties" element={<OwnerPropertiesPage />} />
+            <Route
+              path="properties/add-property"
+              element={<OwnerAddPropertyPage />}
+            />
+            <Route
+              path="properties/:id/edit"
+              element={<OwnerEditPropertyPage />}
+            />
+            <Route
+              path="calendar"
+              element={<RoleCalendarPage role="owner" />}
+            />
+            <Route
+              path="calendar/add-booking"
+              element={<StandaloneAddBookingPage role="owner" />}
+            />
+            <Route
+              path="calendar/:id/edit"
+              element={<StandaloneEditBookingPage role="owner" />}
+            />
+            <Route path="financial" element={<OwnerFinancialPage />} />
+            <Route path="notifications" element={<OwnerNotificationsPage />} />
+            <Route
+              path="settings"
+              element={<RoleSettingsPage role="owner" />}
+            />
+          </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

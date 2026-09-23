@@ -48,10 +48,21 @@ export default function BookingForm({
 
   // Only `active` properties are bookable (in_review / rejected /
   // in_inactive are never offered).
+  const ownedPropertyIds = useMemo(
+    () =>
+      new Set(
+        MOCK_PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID).map(
+          (p) => p.id,
+        ),
+      ),
+    [],
+  );
+
   const properties = useMemo(() => {
     const bookable = MOCK_PROPERTIES.filter((p) => p.status === "active");
     if (role === "owner") {
-      return bookable.filter((p) => p.ownerId === DEMO_OWNER_ID);
+      // For owner: show all properties, but will filter later based on booking type
+      return bookable;
     }
     return bookable;
   }, [role]);
@@ -130,12 +141,31 @@ export default function BookingForm({
           onChange={(e) => update("propertyId", e.target.value)}
           className={inputClass}
         >
-          <option value="">Select a property</option>
-          {properties.map((property) => (
-            <option key={property.id} value={property.id}>
-              {property.name}
-            </option>
-          ))}
+          <option value="">
+            {role === "owner"
+              ? values.bookingType === "maintenance"
+                ? "Select a property"
+                : "Select a property — All Properties"
+              : "Select a property"}
+          </option>
+          {properties
+            .filter((p) => {
+              // For owner: filter based on booking type
+              if (role === "owner") {
+                if (values.bookingType === "maintenance") {
+                  // Maintenance only on owned properties
+                  return ownedPropertyIds.has(p.id);
+                }
+                // Self bookings on all properties
+                return true;
+              }
+              return true;
+            })
+            .map((property) => (
+              <option key={property.id} value={property.id}>
+                {property.name}
+              </option>
+            ))}
         </select>
       </Field>
 
@@ -145,7 +175,12 @@ export default function BookingForm({
             <button
               key={type}
               type="button"
-              onClick={() => update("bookingType", type)}
+              onClick={() => {
+                update("bookingType", type);
+                // Reset property selection when switching booking types
+                // to avoid selecting a property invalid for the new type
+                update("propertyId", "");
+              }}
               className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
                 values.bookingType === type
                   ? "bg-black text-white"

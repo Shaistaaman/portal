@@ -53,13 +53,15 @@ const ICON_BY_TYPE = {
 
 export default function NotificationPopup({
   onClose,
+  role = "admin",
 }: {
   onClose: () => void;
+  role?: "admin" | "owner" | "agent";
 }) {
   const navigate = useNavigate();
 
   const handleViewAll = () => {
-    navigate("/admin/notifications");
+    navigate(`/${role}/notifications`);
     onClose();
   };
   return (

@@ -320,7 +320,12 @@ export default function PropertyList({ role }: { role: PropertyListRole }) {
                   <div className="absolute right-0 mt-1 w-48 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 overflow-hidden">
                     <button
                       type="button"
-                      onClick={() => setActionMenuOpen(false)}
+                      onClick={() => {
+                        setActionMenuOpen(false);
+                        navigate(
+                          `/${role}/calendar?property=${selectedProperty.id}`,
+                        );
+                      }}
                       className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
                     >
                       Property Calendar
@@ -333,9 +338,21 @@ export default function PropertyList({ role }: { role: PropertyListRole }) {
                           `/${role}/properties/${selectedProperty.id}/edit`,
                         );
                       }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                      disabled={
+                        role === "owner" &&
+                        selectedProperty.status === "in_review"
+                      }
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${
+                        role === "owner" &&
+                        selectedProperty.status === "in_review"
+                          ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
+                          : "text-neutral-700 hover:bg-neutral-100"
+                      }`}
                     >
-                      Manage Property
+                      {role === "owner" &&
+                      selectedProperty.status === "in_review"
+                        ? "Edit (In Review)"
+                        : "Manage Property"}
                     </button>
                     {role === "admin" && (
                       <button

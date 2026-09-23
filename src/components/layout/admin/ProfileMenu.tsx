@@ -14,7 +14,11 @@ interface ProfileMenuProps {
  * hardcoded name/avatar, since AuthContext already carries a matching
  * DEMO_ADMIN fixture — no reason to duplicate it here.
  */
-export default function ProfileMenu({ onClose, onLogout }: ProfileMenuProps) {
+export default function ProfileMenu({
+  onClose,
+  onLogout,
+  role = "admin",
+}: ProfileMenuProps & { role?: "admin" | "owner" | "agent" }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -58,7 +62,7 @@ export default function ProfileMenu({ onClose, onLogout }: ProfileMenuProps) {
           <button
             type="button"
             onClick={() => {
-              navigate("/admin/settings");
+              navigate(`/${role}/settings`);
               onClose();
             }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"

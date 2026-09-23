@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { MOCK_PROPERTIES } from "@/features/properties/mockProperties";
+import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 
 interface KpiCard {
   id: string;
@@ -22,6 +25,49 @@ const KPI_CARDS: KpiCard[] = [
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+
+  // Portfolio Health metrics
+  const portfolioMetrics = useMemo(() => {
+    const active = MOCK_PROPERTIES.filter((p) => p.status === "active").length;
+    const inReview = MOCK_PROPERTIES.filter(
+      (p) => p.status === "in_review",
+    ).length;
+    const inactive = MOCK_PROPERTIES.filter(
+      (p) => p.status === "in_inactive",
+    ).length;
+    const rejected = MOCK_PROPERTIES.filter(
+      (p) => p.status === "rejected",
+    ).length;
+    return { active, inReview, inactive, rejected };
+  }, []);
+
+  // Booking Health metrics
+  const bookingMetrics = useMemo(() => {
+    const thisMonth = MOCK_BOOKINGS.filter((b) => {
+      const bookingDate = new Date(b.checkIn);
+      const now = new Date();
+      return (
+        bookingDate.getMonth() === now.getMonth() &&
+        bookingDate.getFullYear() === now.getFullYear()
+      );
+    }).length;
+
+    const completed = MOCK_BOOKINGS.filter(
+      (b) => b.status === "completed",
+    ).length;
+    const completionRate =
+      MOCK_BOOKINGS.length > 0
+        ? Math.round((completed / MOCK_BOOKINGS.length) * 100)
+        : 0;
+
+    const noShow = MOCK_BOOKINGS.filter((b) => b.status === "no_show").length;
+    const noShowRate =
+      MOCK_BOOKINGS.length > 0
+        ? Math.round((noShow / MOCK_BOOKINGS.length) * 100)
+        : 0;
+
+    return { thisMonth, completionRate, noShowRate };
+  }, []);
 
   return (
     <div>
@@ -70,6 +116,80 @@ export default function DashboardPage() {
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Portfolio Health */}
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold text-neutral-950 mb-4">
+          Portfolio Health
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              Active
+            </span>
+            <span className="text-3xl font-light text-green-600 leading-none tracking-tight">
+              {portfolioMetrics.active}
+            </span>
+          </div>
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              In Review
+            </span>
+            <span className="text-3xl font-light text-blue-600 leading-none tracking-tight">
+              {portfolioMetrics.inReview}
+            </span>
+          </div>
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              Inactive
+            </span>
+            <span className="text-3xl font-light text-orange-600 leading-none tracking-tight">
+              {portfolioMetrics.inactive}
+            </span>
+          </div>
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              Rejected
+            </span>
+            <span className="text-3xl font-light text-red-600 leading-none tracking-tight">
+              {portfolioMetrics.rejected}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Health */}
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold text-neutral-950 mb-4">
+          Booking Health
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              Bookings This Month
+            </span>
+            <span className="text-3xl font-light text-neutral-900 leading-none tracking-tight">
+              {bookingMetrics.thisMonth}
+            </span>
+          </div>
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              Completion Rate
+            </span>
+            <span className="text-3xl font-light text-green-600 leading-none tracking-tight">
+              {bookingMetrics.completionRate}%
+            </span>
+          </div>
+          <div className="border border-neutral-300 bg-white p-6 rounded-lg">
+            <span className="text-[11px] font-normal tracking-[0.18em] text-neutral-600 uppercase mb-3 block">
+              No-Show Rate
+            </span>
+            <span className="text-3xl font-light text-red-600 leading-none tracking-tight">
+              {bookingMetrics.noShowRate}%
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
