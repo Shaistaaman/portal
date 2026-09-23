@@ -1,4 +1,5 @@
 import { X, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Notification {
   id: string;
@@ -55,6 +56,12 @@ export default function NotificationPopup({
 }: {
   onClose: () => void;
 }) {
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate("/admin/notifications");
+    onClose();
+  };
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
@@ -101,6 +108,7 @@ export default function NotificationPopup({
         <div className="p-2 border-t border-neutral-100">
           <button
             type="button"
+            onClick={handleViewAll}
             className="w-full py-2 text-xs font-semibold text-center text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"
           >
             View All Notifications

@@ -6,6 +6,7 @@ import LanguageSelector from "@/components/layout/LanguageSelector";
 import MobileMenu from "@/components/layout/admin/MobileMenu";
 import NotificationPopup from "@/components/layout/admin/NotificationPopup";
 import ProfileMenu from "@/components/layout/admin/ProfileMenu";
+import WhatsAppFloatingButton from "@/components/ui/WhatsAppFloatingButton";
 import {
   ADMIN_NAV_ITEMS,
   ADMIN_SETTINGS_ITEM,
@@ -228,6 +229,9 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* WhatsApp support floating button */}
+      <WhatsAppFloatingButton />
     </div>
   );
 }

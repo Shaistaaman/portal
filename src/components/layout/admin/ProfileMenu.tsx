@@ -1,5 +1,7 @@
-import { X, User, Lock, HelpCircle, LogOut } from "lucide-react";
+import { X, MessageCircle, Settings, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/useAuth";
+import { getWhatsAppSupportLink } from "@/utils/whatsapp";
 
 interface ProfileMenuProps {
   onClose: () => void;
@@ -14,6 +16,7 @@ interface ProfileMenuProps {
  */
 export default function ProfileMenu({ onClose, onLogout }: ProfileMenuProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -54,25 +57,24 @@ export default function ProfileMenu({ onClose, onLogout }: ProfileMenuProps) {
         <div className="py-2">
           <button
             type="button"
+            onClick={() => {
+              navigate("/admin/settings");
+              onClose();
+            }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
           >
-            <User className="w-4 h-4 text-neutral-500 shrink-0" />
-            My Profile
+            <Settings className="w-4 h-4 text-neutral-500 shrink-0" />
+            Settings
           </button>
-          <button
-            type="button"
+          <a
+            href={getWhatsAppSupportLink()}
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
           >
-            <Lock className="w-4 h-4 text-neutral-500 shrink-0" />
-            Change Password
-          </button>
-          <button
-            type="button"
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
-          >
-            <HelpCircle className="w-4 h-4 text-neutral-500 shrink-0" />
-            Help & Support
-          </button>
+            <MessageCircle className="w-4 h-4 text-green-500 shrink-0" />
+            Contact Support (WhatsApp)
+          </a>
         </div>
 
         <div className="border-t border-neutral-100 p-2">

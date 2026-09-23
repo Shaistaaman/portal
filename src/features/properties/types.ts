@@ -45,6 +45,9 @@ export interface Property {
   images: string[];
   brochureUrl?: string;
 
+  /** External iCal feed URLs for availability sync. Max 3 (see MAX_ICAL_URLS). */
+  icalUrls: string[];
+
   amenities: string[];
   benefits: string[];
 
@@ -75,11 +78,15 @@ export type PropertyFormValues = Pick<
   | "listingUrl"
   | "images"
   | "brochureUrl"
+  | "icalUrls"
   | "amenities"
   | "benefits"
 >;
 
 export const DEFAULT_IS_FEATURED = false;
+
+/** A property may have at most this many iCal feed URLs. */
+export const MAX_ICAL_URLS = 3;
 
 export const EMPTY_PROPERTY_FORM_VALUES: PropertyFormValues = {
   name: "",
@@ -94,6 +101,7 @@ export const EMPTY_PROPERTY_FORM_VALUES: PropertyFormValues = {
   listingUrl: "",
   images: [],
   brochureUrl: undefined,
+  icalUrls: [],
   amenities: [],
   benefits: [],
 };

@@ -42,6 +42,7 @@ export default function DashboardPage() {
         </button>
         <button
           type="button"
+          onClick={() => navigate("/admin/packages/add-package")}
           className="px-5 py-3 bg-black hover:bg-neutral-800 text-white text-[12px] font-semibold tracking-[0.14em] uppercase rounded-lg transition-colors cursor-pointer"
         >
           Add Package

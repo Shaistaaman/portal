@@ -6,6 +6,7 @@ import {
   Package,
   Calendar,
   DollarSign,
+  FileText,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -31,6 +32,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { icon: Package, label: "Packages", href: "/admin/packages" },
   { icon: Calendar, label: "Calendar", href: "/admin/calendar" },
   { icon: DollarSign, label: "Financial", href: "/admin/financial" },
+  { icon: FileText, label: "Blogs", href: "/admin/blogs" },
 ];
 
 export const ADMIN_SETTINGS_ITEM: AdminNavItem = {

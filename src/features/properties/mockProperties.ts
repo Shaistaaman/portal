@@ -32,6 +32,7 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
+    icalUrls: ["https://calendar.example.com/villa-toscana.ics"],
   },
   {
     id: "2",
@@ -57,6 +58,7 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
+    icalUrls: [],
   },
   {
     id: "3",
@@ -82,6 +84,7 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
+    icalUrls: [],
   },
   {
     id: "4",
@@ -109,6 +112,7 @@ export const MOCK_PROPERTIES: Property[] = [
     rejectionReason:
       "Listing photos do not show the jetty/private dock referenced in the description. Please add supporting images and resubmit.",
     isFeatured: false,
+    icalUrls: [],
   },
   {
     id: "5",
@@ -134,6 +138,7 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
+    icalUrls: [],
   },
   {
     id: "6",
@@ -159,6 +164,7 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
+    icalUrls: [],
   },
   {
     id: "7",
@@ -184,6 +190,7 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
+    icalUrls: [],
   },
   {
     id: "8",
@@ -209,9 +216,144 @@ export const MOCK_PROPERTIES: Property[] = [
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
+    icalUrls: [],
+  },
+  {
+    id: "9",
+    name: "Florence Riverside Loft",
+    location: "Florence, Italy",
+    description:
+      "A light-filled loft on the Arno with a private terrace overlooking the Ponte Vecchio.",
+    status: "active",
+    propertyType: "apartment",
+    managementLevel: "full-service",
+    bedrooms: 2,
+    bathrooms: 2,
+    areaSqm: 140,
+    floorNumber: "3",
+    listingUrl: "",
+    images: [
+      "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: ["Rooftop Terrace", "Smart Home System"],
+    benefits: ["Premium guest matching"],
+    ownerId: "2",
+    ownerName: "Giulia Romano",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
+    isFeatured: false,
+    icalUrls: [],
+  },
+  {
+    id: "10",
+    name: "Positano Sea View Villa",
+    location: "Positano, Italy",
+    description:
+      "A whitewashed villa cascading down the cliffside, with multiple terraces and a heated pool.",
+    status: "active",
+    propertyType: "villa",
+    managementLevel: "full-service",
+    bedrooms: 5,
+    bathrooms: 5,
+    areaSqm: 420,
+    floorNumber: "",
+    listingUrl: "",
+    images: [
+      "https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: [
+      "Private Infinity Pool",
+      "Panoramic Sea View",
+      "Private Chef Available",
+    ],
+    benefits: ["Luxury positioning"],
+    ownerId: "9",
+    ownerName: "Alessandro Barbieri",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
+    isFeatured: false,
+    icalUrls: [],
+  },
+  {
+    id: "11",
+    name: "Turin Art Nouveau Apartment",
+    location: "Turin, Italy",
+    description:
+      "An elegant restored apartment in a Liberty-style palazzo, steps from the historic cafés.",
+    status: "active",
+    propertyType: "apartment",
+    managementLevel: "marketing-only",
+    bedrooms: 3,
+    bathrooms: 2,
+    areaSqm: 175,
+    floorNumber: "2",
+    listingUrl: "",
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: ["Concierge Service", "Home Cinema"],
+    benefits: ["Restyling and branding"],
+    ownerId: "6",
+    ownerName: "Elena Ricci",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
+    isFeatured: false,
+    icalUrls: [],
+  },
+  {
+    id: "12",
+    name: "Capri Cliff Retreat",
+    location: "Capri, Italy",
+    description:
+      "A secluded retreat above the Faraglioni with a private funicular and infinity-edge terrace.",
+    status: "active",
+    propertyType: "villa",
+    managementLevel: "full-service",
+    bedrooms: 4,
+    bathrooms: 4,
+    areaSqm: 360,
+    floorNumber: "",
+    listingUrl: "",
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: [
+      "Private Infinity Pool",
+      "Panoramic Sea View",
+      "Wellness Spa & Sauna",
+    ],
+    benefits: ["Luxury positioning", "Premium guest matching"],
+    ownerId: "2",
+    ownerName: "Giulia Romano",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
+    isFeatured: false,
+    icalUrls: [],
   },
 ];
 
 export function findMockPropertyById(id: string): Property | undefined {
   return MOCK_PROPERTIES.find((property) => property.id === id);
+}
+
+/**
+ * Demo nightly rates by property id. Properties have no price field yet, so
+ * this is a stand-in used by the calendar/booking estimate. One source of
+ * truth (previously duplicated in mockBookings.ts and BookingForm.tsx).
+ */
+const NIGHTLY_RATES: Record<string, number> = {
+  "1": 1200,
+  "2": 850,
+  "3": 1600,
+  "5": 950,
+  "6": 1400,
+  "7": 1100,
+  "9": 780,
+  "10": 1550,
+  "11": 690,
+  "12": 1750,
+};
+
+export function nightlyRateFor(propertyId: string): number {
+  return NIGHTLY_RATES[propertyId] ?? 900;
 }

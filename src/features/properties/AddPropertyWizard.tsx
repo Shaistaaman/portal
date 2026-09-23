@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Plus } from "lucide-react";
 import {
   EMPTY_PROPERTY_FORM_VALUES,
+  MAX_ICAL_URLS,
   PROPERTY_AMENITIES,
   PROPERTY_BENEFITS,
   type PropertyFormValues,
@@ -121,6 +122,25 @@ export default function AddPropertyWizard({
     if (!file) return;
     setBrochureFile(file);
     update("brochureUrl", await readFileAsDataUrl(file));
+  };
+
+  const addIcalUrl = () => {
+    if (values.icalUrls.length >= MAX_ICAL_URLS) return;
+    update("icalUrls", [...values.icalUrls, ""]);
+  };
+
+  const updateIcalUrl = (index: number, value: string) => {
+    update(
+      "icalUrls",
+      values.icalUrls.map((url, i) => (i === index ? value : url)),
+    );
+  };
+
+  const removeIcalUrl = (index: number) => {
+    update(
+      "icalUrls",
+      values.icalUrls.filter((_, i) => i !== index),
+    );
   };
 
   const toggleAmenity = (amenity: string) => {
@@ -271,6 +291,40 @@ export default function AddPropertyWizard({
                 }
               />
             </label>
+          </Field>
+
+          <Field label={`iCal Links (optional, up to ${MAX_ICAL_URLS})`}>
+            <div className="space-y-2">
+              {values.icalUrls.map((url, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => updateIcalUrl(index, e.target.value)}
+                    placeholder="https://calendar.example.com/feed.ics"
+                    className={inputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeIcalUrl(index)}
+                    aria-label={`Remove iCal link ${index + 1}`}
+                    className="shrink-0 p-3 text-neutral-400 hover:text-red-600 border border-neutral-300 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {values.icalUrls.length < MAX_ICAL_URLS && (
+                <button
+                  type="button"
+                  onClick={addIcalUrl}
+                  className="flex items-center gap-1.5 px-4 py-2.5 border border-neutral-300 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add iCal link
+                </button>
+              )}
+            </div>
           </Field>
         </div>
       )}
