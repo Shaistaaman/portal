@@ -162,9 +162,19 @@ interface LocationState {
     id: string;
     title: string;
   };
+  selectedExperiences?: Array<{
+    id: string;
+    title: string;
+    price: number;
+    rating: number;
+    image: string;
+    category: string;
+    location: string;
+  }>;
   startDate?: Date | null;
   endDate?: Date | null;
   totalPrice?: number;
+  isWishlistFlow?: boolean;
 }
 
 interface Experience {
@@ -184,12 +194,18 @@ export default function RequestExperiencePage() {
   const { propertyId } = useParams<{ propertyId: string }>();
 
   const state = (location.state as LocationState) || {};
-  const { property, startDate, endDate, totalPrice = 0 } = state;
+  const {
+    property,
+    selectedExperiences: initialExperiences = [],
+    isWishlistFlow = false,
+    startDate,
+    endDate,
+    totalPrice = 0,
+  } = state;
 
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedExperiences, setSelectedExperiences] = useState<Experience[]>(
-    [],
-  );
+  const [selectedExperiences, setSelectedExperiences] =
+    useState<Experience[]>(initialExperiences);
   const [wishlistItems, setWishlistItems] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
   const [lastAddedExperience, setLastAddedExperience] =
@@ -282,14 +298,16 @@ export default function RequestExperiencePage() {
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900">
       <main className="mx-auto max-w-[1280px] px-4 py-8 sm:px-8 lg:px-12">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-8 flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back
-        </button>
+        {/* Back Button - Hidden in wishlist flow */}
+        {!isWishlistFlow && (
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-8 flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back
+          </button>
+        )}
 
         {/* Title Section */}
         <div className="mb-8">
@@ -441,8 +459,8 @@ export default function RequestExperiencePage() {
                 Order Summary
               </h3>
 
-              {/* Property */}
-              {property && (
+              {/* Property - Hidden in wishlist flow */}
+              {property && !isWishlistFlow && (
                 <div className="mb-4">
                   <p className="text-xs font-light text-neutral-500 mb-1">
                     PROPERTY
@@ -453,15 +471,17 @@ export default function RequestExperiencePage() {
                 </div>
               )}
 
-              {/* Base Price */}
-              <div className="mb-4 pb-4 border-b border-neutral-200">
-                <p className="text-xs font-light text-neutral-500 mb-1">
-                  BASE PRICE
-                </p>
-                <p className="text-sm font-medium text-neutral-900">
-                  €{totalPrice}
-                </p>
-              </div>
+              {/* Base Price - Hidden in wishlist flow */}
+              {!isWishlistFlow && (
+                <div className="mb-4 pb-4 border-b border-neutral-200">
+                  <p className="text-xs font-light text-neutral-500 mb-1">
+                    BASE PRICE
+                  </p>
+                  <p className="text-sm font-medium text-neutral-900">
+                    €{totalPrice}
+                  </p>
+                </div>
+              )}
 
               {/* Selected Experiences */}
               {selectedExperiences.length > 0 && (
@@ -523,7 +543,13 @@ export default function RequestExperiencePage() {
         <ExperienceModal
           isOpen={showModal}
           experience={lastAddedExperience}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            // If wishlist flow, redirect to bookings after modal closes
+            if (isWishlistFlow) {
+              setTimeout(() => navigate("/client/bookings"), 500);
+            }
+          }}
         />
       )}
     </div>

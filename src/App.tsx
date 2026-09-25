@@ -55,6 +55,11 @@ import SharedContactInfoPage from "@/pages/shared/ContactInfoPage";
 import SharedRequestExperiencePage from "@/pages/shared/RequestExperiencePage";
 import AgentLayout from "@/layouts/AgentLayout";
 import ClientNotificationsPage from "@/pages/client/NotificationsPage";
+import ClientLayout from "@/layouts/ClientLayout";
+import ClientDashboardPage from "@/pages/client/DashboardPage";
+import ClientBookingsPage from "@/pages/client/BookingsPage";
+import ClientWishlistPage from "@/pages/client/WishlistPage";
+import ClientSettingsPage from "@/pages/client/SettingsPage";
 
 function App() {
   return (
@@ -67,61 +72,33 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route
-            path="/client/dashboard"
+            path="/client"
             element={
               <RoleRoute allow={["client"]}>
-                <PlaceholderPage title="Client Dashboard" fullScreen />
+                <ClientLayout />
               </RoleRoute>
             }
-          />
-          <Route
-            path="/client/settings"
-            element={
-              <RoleRoute allow={["client"]}>
-                <RoleSettingsPage role="client" />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/client/notifications"
-            element={
-              <RoleRoute allow={["client"]}>
-                <ClientNotificationsPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/client/search"
-            element={
-              <RoleRoute allow={["client"]}>
-                <RoleSearchResultsPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/client/property/:propertyId"
-            element={
-              <RoleRoute allow={["client"]}>
-                <SharedPropertyDetailPage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/client/property/:propertyId/request-experience"
-            element={
-              <RoleRoute allow={["client"]}>
-                <SharedRequestExperiencePage />
-              </RoleRoute>
-            }
-          />
-          <Route
-            path="/client/property/:propertyId/contact"
-            element={
-              <RoleRoute allow={["client"]}>
-                <SharedContactInfoPage />
-              </RoleRoute>
-            }
-          />
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<ClientDashboardPage />} />
+            <Route path="bookings" element={<ClientBookingsPage />} />
+            <Route path="wishlist" element={<ClientWishlistPage />} />
+            <Route path="settings" element={<ClientSettingsPage />} />
+            <Route path="notifications" element={<ClientNotificationsPage />} />
+            <Route path="search" element={<RoleSearchResultsPage />} />
+            <Route
+              path="property/:propertyId"
+              element={<SharedPropertyDetailPage />}
+            />
+            <Route
+              path="property/:propertyId/request-experience"
+              element={<SharedRequestExperiencePage />}
+            />
+            <Route
+              path="property/:propertyId/contact"
+              element={<SharedContactInfoPage />}
+            />
+          </Route>
 
           {/* Staff-facing, each scoped to its own login surface */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
