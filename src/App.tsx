@@ -5,7 +5,6 @@ import SignupPage from "@/pages/auth/SignupPage";
 import AdminLoginPage from "@/pages/auth/AdminLoginPage";
 import AgentLoginPage from "@/pages/auth/AgentLoginPage";
 import OwnerLoginPage from "@/pages/auth/OwnerLoginPage";
-import PlaceholderPage from "@/pages/PlaceholderPage";
 import RoleRoute from "@/routes/RoleRoute";
 import AdminLayout from "@/layouts/AdminLayout";
 import OwnerLayout from "@/layouts/OwnerLayout";

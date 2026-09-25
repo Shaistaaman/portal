@@ -56,7 +56,7 @@ export default function NotificationPopup({
   role = "admin",
 }: {
   onClose: () => void;
-  role?: "admin" | "owner" | "agent";
+  role?: "admin" | "owner" | "agent" | "client";
 }) {
   const navigate = useNavigate();
 

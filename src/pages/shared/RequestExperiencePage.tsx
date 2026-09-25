@@ -1,4 +1,3 @@
-import { motion } from "motion/react";
 import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";

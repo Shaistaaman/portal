@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronLeft, LogOut } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 
 export default function ClientSidebar() {
