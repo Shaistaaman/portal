@@ -48,7 +48,7 @@ const DEMO_AGENT_DATA: AgentProfileForm = {
   latitude: "45.4642",
   longitude: "9.1900",
   agencyLicensePreview: "",
-  brandImagePreview: "",
+  brandImagePreview: "/images/logo-black.png",
 };
 
 function readFileAsDataUrl(file: File): Promise<string> {
@@ -147,21 +147,51 @@ export default function AgentSettingsPage() {
         <form className="space-y-8">
           {/* Photo */}
           <div className="border border-neutral-200 rounded-lg p-6">
-            <h2 className="text-sm font-semibold text-neutral-950 mb-4">
+            <h2 className="text-sm font-semibold text-neutral-950 mb-6">
               Profile Photo
             </h2>
-            <div className="flex items-center gap-6">
-              <img
-                src={values.photo}
-                alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border border-neutral-200"
-              />
-              <FileDropzone
-                label="Upload Photo"
-                preview={values.photo}
-                onSelect={(file) => handlePhotoChange(file)}
-                onRemove={() => {}}
-              />
+            <div className="space-y-4">
+              {values.photo && (
+                <div className="relative inline-block">
+                  <img
+                    src={values.photo}
+                    alt="Preview"
+                    className="w-32 h-40 object-cover rounded-lg border border-neutral-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => update("photo", "")}
+                    className="absolute -top-2 -right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors cursor-pointer shadow-lg"
+                    aria-label="Delete photo"
+                    title="Delete photo"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+
+              {!values.photo && (
+                <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-neutral-300 rounded-lg bg-neutral-50 hover:bg-neutral-100 transition-colors cursor-pointer">
+                  <div className="flex flex-col items-center justify-center pt-6 pb-6">
+                    <Upload className="w-8 h-8 text-neutral-400 mb-2" />
+                    <p className="text-sm font-semibold text-neutral-900 text-center">
+                      Upload Photo
+                    </p>
+                    <p className="text-xs text-neutral-600 text-center mt-1">
+                      Click to select an image
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handlePhotoChange(file);
+                    }}
+                  />
+                </label>
+              )}
             </div>
           </div>
 
@@ -293,15 +323,6 @@ export default function AgentSettingsPage() {
 
           {/* Action buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t border-neutral-200">
-            {profileComplete && (
-              <button
-                type="button"
-                onClick={() => navigate("/agent/dashboard")}
-                className="px-6 py-3 text-sm font-medium text-neutral-700 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer"
-              >
-                Back to Dashboard
-              </button>
-            )}
             <button
               type="button"
               onClick={handleConfirm}

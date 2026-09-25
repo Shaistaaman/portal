@@ -10,6 +10,9 @@ import {
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 import { isAgentProfileComplete } from "@/features/agent/agentProfileState";
 import type { Booking } from "@/features/calendar/types";
+import PropertySearch, {
+  type Guests,
+} from "@/components/search/PropertySearch";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -35,6 +38,16 @@ export default function AgentDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+
+  // Search component state
+  const [location, setLocation] = useState("");
+  const [checkIn, setCheckIn] = useState<Date | null>(null);
+  const [checkOut, setCheckOut] = useState<Date | null>(null);
+  const [guests, setGuests] = useState<Guests>({
+    adults: 1,
+    children: 0,
+    infants: 0,
+  });
 
   const profileComplete = isAgentProfileComplete();
 
@@ -164,6 +177,21 @@ export default function AgentDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Property Search Component */}
+      <div className="mb-8">
+        <PropertySearch
+          location={location}
+          setLocation={setLocation}
+          checkIn={checkIn}
+          setCheckIn={setCheckIn}
+          checkOut={checkOut}
+          setCheckOut={setCheckOut}
+          guests={guests}
+          setGuests={setGuests}
+          disabled={!profileComplete}
+        />
+      </div>
 
       <div className="flex justify-end gap-3 mb-8">
         <button

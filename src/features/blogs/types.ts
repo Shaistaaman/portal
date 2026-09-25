@@ -1,3 +1,5 @@
+import { uuid } from "@/utils/uuid";
+
 /**
  * Blog types. Admin-only feature (like Experiences/Packages), with a plain
  * active/in_active status and no approval workflow. The add/edit wizard is
@@ -42,7 +44,7 @@ export type BlogFormValues = Pick<
 
 export function createBlogSection(): BlogSection {
   return {
-    id: crypto.randomUUID(),
+    id: uuid(),
     heading: "",
     category: "",
     image: "",

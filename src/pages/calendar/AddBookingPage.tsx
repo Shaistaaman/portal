@@ -11,13 +11,13 @@ import type { UserRole } from "@/types/auth";
  */
 export default function AddBookingPage({ role }: { role: UserRole }) {
   const navigate = useNavigate();
-  const calendarPath = `/${role}/calendar`;
+  const dashboardPath = `/${role}/dashboard`;
 
   return (
     <div>
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate(dashboardPath)}
         className="flex items-center gap-1.5 text-sm text-neutral-600 hover:text-neutral-950 mb-6 cursor-pointer"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -36,9 +36,9 @@ export default function AddBookingPage({ role }: { role: UserRole }) {
           // created booking starts at INITIAL_STATUS_BY_TYPE[values.bookingType]
           // and records createdByRole = role.
           void INITIAL_STATUS_BY_TYPE[values.bookingType];
-          navigate(calendarPath);
+          navigate(dashboardPath);
         }}
-        onCancel={() => navigate(calendarPath)}
+        onCancel={() => navigate(dashboardPath)}
       />
     </div>
   );

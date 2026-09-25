@@ -7,6 +7,8 @@
  * provided wizard screens.
  */
 
+import { uuid } from "@/utils/uuid";
+
 export type PackageStatus = "active" | "in_active";
 
 /**
@@ -56,7 +58,7 @@ export type PackageFormValues = Pick<
 
 export function createHighlightBlock(): PackageHighlightBlock {
   return {
-    id: crypto.randomUUID(),
+    id: uuid(),
     heading: "",
     category: "",
     image: "",

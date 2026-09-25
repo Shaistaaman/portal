@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import BookingForm from "@/features/calendar/BookingForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
@@ -28,8 +28,15 @@ const DEMO_OWNER_ID = "2";
  */
 export default function EditBookingPage({ role }: { role: UserRole }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { id } = useParams<{ id: string }>();
   const calendarPath = `/${role}/calendar`;
+
+  // If coming from search results, go back to search on cancel
+  const searchPath = searchParams.toString()
+    ? `/${role}/search?${searchParams.toString()}`
+    : calendarPath;
+
   const booking = id ? findMockBookingById(id) : undefined;
 
   const [pendingTransition, setPendingTransition] =
@@ -75,7 +82,7 @@ export default function EditBookingPage({ role }: { role: UserRole }) {
 
   return (
     <div>
-      <BackButton onClick={() => navigate(-1)} label="Back" />
+      <BackButton onClick={() => navigate(searchPath)} label="Back" />
 
       <h1 className="text-3xl font-semibold text-neutral-950 mb-2">
         Edit Booking
@@ -150,7 +157,7 @@ export default function EditBookingPage({ role }: { role: UserRole }) {
           // TODO(AWS integration): PATCH the booking fields.
           navigate(calendarPath);
         }}
-        onCancel={() => navigate(calendarPath)}
+        onCancel={() => navigate(searchPath)}
       />
 
       {/* Delete */}

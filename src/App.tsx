@@ -30,6 +30,7 @@ import AdminAddBlogPage from "@/pages/admin/AddBlogPage";
 import AdminEditBlogPage from "@/pages/admin/EditBlogPage";
 import AdminCalendarPage from "@/pages/admin/CalendarPage";
 import RoleCalendarPage from "@/pages/calendar/RoleCalendarPage";
+import RoleSearchResultsPage from "@/pages/search/RoleSearchResultsPage";
 import AdminFinancialPage from "@/pages/admin/FinancialPage";
 import AdminAddFinancialRecordPage from "@/pages/admin/AddFinancialRecordPage";
 import AdminNotificationsPage from "@/pages/admin/NotificationsPage";
@@ -49,6 +50,8 @@ import AgentDashboardPage from "@/pages/agent/DashboardPage";
 import AgentSettingsPage from "@/pages/agent/SettingsPage";
 import AgentNotificationsPage from "@/pages/agent/NotificationsPage";
 import AgentFinancialPage from "@/pages/agent/FinancialPage";
+import SharedPropertyDetailPage from "@/pages/shared/PropertyDetailPage";
+import SharedContactInfoPage from "@/pages/shared/ContactInfoPage";
 import AgentLayout from "@/layouts/AgentLayout";
 import ClientNotificationsPage from "@/pages/client/NotificationsPage";
 
@@ -83,6 +86,30 @@ function App() {
             element={
               <RoleRoute allow={["client"]}>
                 <ClientNotificationsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/client/search"
+            element={
+              <RoleRoute allow={["client"]}>
+                <RoleSearchResultsPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/client/property/:propertyId"
+            element={
+              <RoleRoute allow={["client"]}>
+                <SharedPropertyDetailPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/client/property/:propertyId/contact"
+            element={
+              <RoleRoute allow={["client"]}>
+                <SharedContactInfoPage />
               </RoleRoute>
             }
           />
@@ -168,6 +195,15 @@ function App() {
             <Route
               path="calendar"
               element={<RoleCalendarPage role="agent" />}
+            />
+            <Route path="search" element={<RoleSearchResultsPage />} />
+            <Route
+              path="property/:propertyId"
+              element={<SharedPropertyDetailPage />}
+            />
+            <Route
+              path="property/:propertyId/contact"
+              element={<SharedContactInfoPage />}
             />
             <Route
               path="calendar/add-booking"
