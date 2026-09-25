@@ -52,6 +52,7 @@ import AgentNotificationsPage from "@/pages/agent/NotificationsPage";
 import AgentFinancialPage from "@/pages/agent/FinancialPage";
 import SharedPropertyDetailPage from "@/pages/shared/PropertyDetailPage";
 import SharedContactInfoPage from "@/pages/shared/ContactInfoPage";
+import SharedRequestExperiencePage from "@/pages/shared/RequestExperiencePage";
 import AgentLayout from "@/layouts/AgentLayout";
 import ClientNotificationsPage from "@/pages/client/NotificationsPage";
 
@@ -102,6 +103,14 @@ function App() {
             element={
               <RoleRoute allow={["client"]}>
                 <SharedPropertyDetailPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/client/property/:propertyId/request-experience"
+            element={
+              <RoleRoute allow={["client"]}>
+                <SharedRequestExperiencePage />
               </RoleRoute>
             }
           />
@@ -200,6 +209,10 @@ function App() {
             <Route
               path="property/:propertyId"
               element={<SharedPropertyDetailPage />}
+            />
+            <Route
+              path="property/:propertyId/request-experience"
+              element={<SharedRequestExperiencePage />}
             />
             <Route
               path="property/:propertyId/contact"

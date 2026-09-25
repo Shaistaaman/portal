@@ -1,4 +1,13 @@
-import { Star, Heart, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import {
+  Star,
+  Heart,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Bed,
+  ShowerHead,
+  Users,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   MOCK_PROPERTIES,
@@ -298,19 +307,21 @@ export default function SearchResults({
                             <h2 className="text-2xl font-semibold text-neutral-950">
                               {property.name}
                             </h2>
-                            <button
-                              onClick={() => toggleLike(property.id)}
-                              className="flex-shrink-0 p-2 hover:bg-neutral-100 rounded-full transition-colors"
-                              aria-label="Like property"
-                            >
-                              <Heart
-                                className={`w-6 h-6 transition-colors ${
-                                  isLiked
-                                    ? "fill-red-500 text-red-500"
-                                    : "text-neutral-400"
-                                }`}
-                              />
-                            </button>
+                            {!isAgent && (
+                              <button
+                                onClick={() => toggleLike(property.id)}
+                                className="flex-shrink-0 p-2 hover:bg-neutral-100 rounded-full transition-colors"
+                                aria-label="Like property"
+                              >
+                                <Heart
+                                  className={`w-6 h-6 transition-colors ${
+                                    isLiked
+                                      ? "fill-red-500 text-red-500"
+                                      : "text-neutral-400"
+                                  }`}
+                                />
+                              </button>
+                            )}
                           </div>
 
                           {/* Rating and Price */}
@@ -334,15 +345,27 @@ export default function SearchResults({
                             </div>
                           </div>
 
-                          {/* Details */}
-                          <p className="text-neutral-700 text-sm font-light">
-                            {guestCount > 0 && `${guestCount} guests`}
-                            {guestCount > 0 && property.bedrooms > 0 && " | "}
-                            {property.bedrooms > 0 &&
-                              `${property.bedrooms} bedroom${property.bedrooms > 1 ? "s" : ""}`}
-                            {property.bathrooms > 0 &&
-                              ` | ${property.bathrooms} bathroom${property.bathrooms > 1 ? "s" : ""}`}
-                          </p>
+                          {/* Details with Icons */}
+                          <div className="flex items-center gap-4 text-sm text-neutral-700">
+                            {property.bedrooms > 0 && (
+                              <div className="flex items-center gap-1">
+                                <Bed className="h-4 w-4 text-neutral-600" />
+                                <span>{property.bedrooms}</span>
+                              </div>
+                            )}
+                            {property.bathrooms > 0 && (
+                              <div className="flex items-center gap-1">
+                                <ShowerHead className="h-4 w-4 text-neutral-600" />
+                                <span>{property.bathrooms}</span>
+                              </div>
+                            )}
+                            {guestCount > 0 && (
+                              <div className="flex items-center gap-1">
+                                <Users className="h-4 w-4 text-neutral-600" />
+                                <span>{guestCount}</span>
+                              </div>
+                            )}
+                          </div>
 
                           {/* View Details Button */}
                           <div className="mt-4 flex gap-2">

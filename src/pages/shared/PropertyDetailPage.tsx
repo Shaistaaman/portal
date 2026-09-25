@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Download,
   Grid,
+  Heart,
   Maximize2,
   ShieldCheck,
   ShowerHead,
@@ -46,7 +47,7 @@ function isBetweenDays(
 export default function PropertyDetailPage() {
   const role = useRole();
   const isAgent = role === "agent";
-  
+
   const { propertyId } = useParams<{ propertyId: string }>();
   const property = useMemo(() => findPropertyData(propertyId), [propertyId]);
   const location = useLocation();
@@ -72,6 +73,7 @@ export default function PropertyDetailPage() {
   // Gallery lightbox
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Selected range defaults to 28 Jul – 10 Aug 2026
   const [startDate, setStartDate] = useState<Date | null>(
@@ -313,7 +315,23 @@ export default function PropertyDetailPage() {
           </p>
 
           {/* HERO GALLERY */}
-          <div className="mb-16 grid h-auto grid-cols-1 gap-2.5 sm:gap-3 md:h-[480px] lg:mb-24 lg:h-[540px] lg:grid-cols-2 sm:mb-20">
+          <div className="mb-16 grid h-auto grid-cols-1 gap-2.5 sm:gap-3 md:h-[480px] lg:mb-24 lg:h-[540px] lg:grid-cols-2 sm:mb-20 relative">
+            {/* Heart Icon - Client Only */}
+            {role === "client" && (
+              <button
+                onClick={() => setIsWishlisted(!isWishlisted)}
+                className="absolute top-4 right-4 z-10 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all cursor-pointer"
+              >
+                <Heart
+                  className={`h-6 w-6 transition-all ${
+                    isWishlisted
+                      ? "fill-red-500 text-red-500"
+                      : "text-neutral-900"
+                  }`}
+                />
+              </button>
+            )}
+
             {/* Main image */}
             <div
               onClick={() => {
@@ -550,10 +568,10 @@ export default function PropertyDetailPage() {
 
                 <button
                   onClick={() => {
-                    const contactPath = isAgent
-                      ? `/agent/property/${propertyId}/contact`
-                      : `/client/property/${propertyId}/contact`;
-                    navigate(contactPath, {
+                    const experiencePath = isAgent
+                      ? `/agent/property/${propertyId}/request-experience`
+                      : `/client/property/${propertyId}/request-experience`;
+                    navigate(experiencePath, {
                       state: {
                         property: { id: property.id, title: property.title },
                         startDate,
