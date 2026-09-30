@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddExperienceWizard from "@/features/experiences/AddExperienceWizard";
+import { EXPERIENCE_CREATION_STATUS } from "@/features/experiences/types";
 
 export default function AdminAddExperiencePage() {
   const navigate = useNavigate();
@@ -24,8 +25,11 @@ export default function AdminAddExperiencePage() {
       </p>
 
       <AddExperienceWizard
-        onSubmit={() => {
+        onSubmit={(values) => {
           // TODO(AWS integration): POST to admin-fn's experience endpoint.
+          // Created inactive (draft) — not visible on the marketing site
+          // until an admin switches it on from the experience list.
+          void { ...values, status: EXPERIENCE_CREATION_STATUS };
         }}
         onClose={() => navigate("/admin/experiences")}
       />

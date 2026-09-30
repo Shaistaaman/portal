@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, Calendar } from "lucide-react";
 import { MOCK_PROPERTIES } from "@/features/properties/mockProperties";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
-import type { Booking } from "@/features/calendar/types";
+import { bookingNumbers, type Booking } from "@/features/calendar/types";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 /**
  * Demo-only owner id matching the PropertyList scoping.
@@ -20,10 +21,11 @@ interface KpiCard {
 }
 
 const BOOKING_STATUS_STYLES: Record<string, string> = {
+  requested: "bg-purple-100 text-purple-800",
   confirmed: "bg-green-100 text-green-800",
-  payment_pending: "bg-orange-100 text-orange-800",
   completed: "bg-blue-100 text-blue-800",
   blocked: "bg-gray-100 text-gray-800",
+  no_show: "bg-slate-100 text-slate-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -44,7 +46,7 @@ export default function OwnerDashboardPage() {
     const total = ownedProperties.length;
     const active = ownedProperties.filter((p) => p.status === "active").length;
     const inactive = ownedProperties.filter(
-      (p) => p.status === "in_inactive",
+      (p) => p.status === "inactive",
     ).length;
     return { total, active, inactive };
   }, [ownedProperties]);
@@ -124,18 +126,28 @@ export default function OwnerDashboardPage() {
     },
   ];
 
-  const markComplete = (bookingId: string) => {
+  // Stable Booking Numbers (BK-YYYY-MM-NNN) for the whole dataset.
+  const numbers = useMemo(() => bookingNumbers(bookings), [bookings]);
+
+  // Held until the owner confirms Mark Complete.
+  const [pendingComplete, setPendingComplete] = useState<Booking | null>(null);
+
+  const confirmComplete = () => {
+    if (!pendingComplete) return;
     setBookings((current) =>
       current.map((b) =>
-        b.id === bookingId ? { ...b, status: "completed" as const } : b,
+        b.id === pendingComplete.id
+          ? { ...b, status: "completed" as const }
+          : b,
       ),
     );
+    setPendingComplete(null);
   };
 
   /**
    * Check if a booking can be marked complete:
    * - Must be created by owner (createdByRole === "owner")
-   * - Status must be confirmed (not payment_pending)
+   * - Status must be confirmed
    * - Checkout date must be in the past
    */
   const canMarkComplete = (booking: Booking): boolean => {
@@ -224,8 +236,8 @@ export default function OwnerDashboardPage() {
               className="px-4 py-2.5 text-sm font-medium border border-neutral-300 rounded-lg text-neutral-700 bg-white hover:bg-neutral-50 focus:outline-none focus:ring-1 focus:ring-black transition cursor-pointer"
             >
               <option value="all">Status: All</option>
+              <option value="requested">Requested</option>
               <option value="confirmed">Confirmed</option>
-              <option value="payment_pending">Payment Pending</option>
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
@@ -237,11 +249,11 @@ export default function OwnerDashboardPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-neutral-200 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wide">
+                <th className="px-6 py-3">Booking No.</th>
                 <th className="px-6 py-3">Property</th>
                 <th className="px-6 py-3">Guest</th>
                 <th className="px-6 py-3">Booked By</th>
-                <th className="px-6 py-3">Check In</th>
-                <th className="px-6 py-3">Check Out</th>
+                <th className="px-6 py-3">Check In / Out</th>
                 <th className="px-6 py-3">Status</th>
                 <th className="px-6 py-3 text-right">Actions</th>
               </tr>
@@ -252,6 +264,9 @@ export default function OwnerDashboardPage() {
                   key={booking.id}
                   className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors"
                 >
+                  <td className="px-6 py-3 font-medium text-blue-600 whitespace-nowrap">
+                    {numbers[booking.id]}
+                  </td>
                   <td className="px-6 py-3 font-medium text-neutral-950">
                     {booking.propertyName}
                   </td>
@@ -272,11 +287,11 @@ export default function OwnerDashboardPage() {
                       {getBookedByLabel(booking)}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-neutral-700">
-                    {new Date(booking.checkIn).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-3 text-neutral-700">
-                    {new Date(booking.checkOut).toLocaleDateString()}
+                  <td className="px-6 py-3 text-neutral-700 whitespace-nowrap">
+                    <div>{new Date(booking.checkIn).toLocaleDateString()}</div>
+                    <div className="text-xs text-neutral-500">
+                      {new Date(booking.checkOut).toLocaleDateString()}
+                    </div>
                   </td>
                   <td className="px-6 py-3">
                     <span
@@ -305,7 +320,7 @@ export default function OwnerDashboardPage() {
                       {canMarkComplete(booking) && (
                         <button
                           type="button"
-                          onClick={() => markComplete(booking.id)}
+                          onClick={() => setPendingComplete(booking)}
                           className="px-3 py-1.5 text-xs font-medium bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors cursor-pointer"
                         >
                           Mark Complete
@@ -318,7 +333,7 @@ export default function OwnerDashboardPage() {
               {paginatedBookings.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-6 py-12 text-center text-neutral-500"
                   >
                     No bookings found.
@@ -367,6 +382,16 @@ export default function OwnerDashboardPage() {
           </div>
         )}
       </div>
+
+      {pendingComplete && (
+        <ConfirmModal
+          title="Mark Completed?"
+          message={`Booking ${numbers[pendingComplete.id]} will be marked as completed.`}
+          confirmLabel="Mark Completed"
+          onCancel={() => setPendingComplete(null)}
+          onConfirm={confirmComplete}
+        />
+      )}
     </div>
   );
 }

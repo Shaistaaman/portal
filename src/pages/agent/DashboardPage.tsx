@@ -9,10 +9,11 @@ import {
 } from "lucide-react";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 import { isAgentProfileComplete } from "@/features/agent/agentProfileState";
-import type { Booking } from "@/features/calendar/types";
+import { bookingNumbers, type Booking } from "@/features/calendar/types";
 import PropertySearch, {
   type Guests,
 } from "@/components/search/PropertySearch";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -24,12 +25,12 @@ interface KpiCard {
 }
 
 const BOOKING_STATUS_STYLES: Record<string, string> = {
+  requested: "bg-purple-100 text-purple-800",
   confirmed: "bg-green-100 text-green-800",
-  payment_pending: "bg-orange-100 text-orange-800",
   completed: "bg-blue-100 text-blue-800",
   blocked: "bg-gray-100 text-gray-800",
   no_show: "bg-slate-100 text-slate-800",
-  cancelled_refunded: "bg-neutral-100 text-neutral-800",
+  cancelled: "bg-neutral-100 text-neutral-800",
 };
 
 export default function AgentDashboardPage() {
@@ -73,7 +74,7 @@ export default function AgentDashboardPage() {
 
     const propertyCount = new Set(agentBookings.map((b) => b.propertyId)).size;
     const activeCount = agentBookings.filter(
-      (b) => b.status === "confirmed" || b.status === "payment_pending",
+      (b) => b.status === "confirmed" || b.status === "requested",
     ).length;
     const completedCount = agentBookings.filter(
       (b) => b.status === "completed",
@@ -144,12 +145,22 @@ export default function AgentDashboardPage() {
     return checkoutDate < today;
   };
 
-  const markConfirm = (bookingId: string) => {
+  // Stable Booking Numbers (BK-YYYY-MM-NNN) for the whole dataset.
+  const numbers = useMemo(() => bookingNumbers(bookings), [bookings]);
+
+  // Held until the admin/agent confirms the Mark Complete action.
+  const [pendingComplete, setPendingComplete] = useState<Booking | null>(null);
+
+  const confirmComplete = () => {
+    if (!pendingComplete) return;
     setBookings((current) =>
       current.map((b) =>
-        b.id === bookingId ? { ...b, status: "completed" as const } : b,
+        b.id === pendingComplete.id
+          ? { ...b, status: "completed" as const }
+          : b,
       ),
     );
+    setPendingComplete(null);
   };
 
   return (
@@ -261,8 +272,8 @@ export default function AgentDashboardPage() {
               className="px-4 py-2.5 text-sm font-medium border border-neutral-300 rounded-lg text-neutral-700 bg-white hover:bg-neutral-50 focus:outline-none focus:ring-1 focus:ring-black transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="all">Status: All</option>
+              <option value="requested">Requested</option>
               <option value="confirmed">Confirmed</option>
-              <option value="payment_pending">Payment Pending</option>
               <option value="completed">Completed</option>
               <option value="no_show">No-Show</option>
             </select>
@@ -274,10 +285,10 @@ export default function AgentDashboardPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-neutral-200 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wide">
+                <th className="px-6 py-3">Booking No.</th>
                 <th className="px-6 py-3">Property</th>
                 <th className="px-6 py-3">Guest</th>
-                <th className="px-6 py-3">Check In</th>
-                <th className="px-6 py-3">Check Out</th>
+                <th className="px-6 py-3">Check In / Out</th>
                 <th className="px-6 py-3">Status</th>
                 <th className="px-6 py-3 text-right">Actions</th>
               </tr>
@@ -303,6 +314,9 @@ export default function AgentDashboardPage() {
                     key={booking.id}
                     className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors"
                   >
+                    <td className="px-6 py-3 font-medium text-blue-600 whitespace-nowrap">
+                      {numbers[booking.id]}
+                    </td>
                     <td className="px-6 py-3 font-medium text-neutral-950">
                       {booking.propertyName}
                     </td>
@@ -314,11 +328,13 @@ export default function AgentDashboardPage() {
                         {booking.guestPhone}
                       </div>
                     </td>
-                    <td className="px-6 py-3 text-neutral-700">
-                      {new Date(booking.checkIn).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-3 text-neutral-700">
-                      {new Date(booking.checkOut).toLocaleDateString()}
+                    <td className="px-6 py-3 text-neutral-700 whitespace-nowrap">
+                      <div>
+                        {new Date(booking.checkIn).toLocaleDateString()}
+                      </div>
+                      <div className="text-xs text-neutral-500">
+                        {new Date(booking.checkOut).toLocaleDateString()}
+                      </div>
                     </td>
                     <td className="px-6 py-3">
                       <span
@@ -347,7 +363,7 @@ export default function AgentDashboardPage() {
                         {canMarkConfirm(booking) && (
                           <button
                             type="button"
-                            onClick={() => markConfirm(booking.id)}
+                            onClick={() => setPendingComplete(booking)}
                             className="px-3 py-1.5 text-xs font-medium bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors cursor-pointer"
                           >
                             Mark Complete
@@ -400,6 +416,16 @@ export default function AgentDashboardPage() {
           </div>
         )}
       </div>
+
+      {pendingComplete && (
+        <ConfirmModal
+          title="Mark Completed?"
+          message={`Booking ${numbers[pendingComplete.id]} will be marked as completed.`}
+          confirmLabel="Mark Completed"
+          onCancel={() => setPendingComplete(null)}
+          onConfirm={confirmComplete}
+        />
+      )}
     </div>
   );
 }

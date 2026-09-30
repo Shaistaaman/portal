@@ -1,7 +1,7 @@
 /**
  * Package types, modeled from the add/edit wizard reference designs. Like
  * Experiences, Packages are admin-only (Project_Specification.md §3) with a
- * plain active/in_active status and no approval workflow. There is no
+ * plain active/inactive status and no approval workflow. There is no
  * Next.js reference implementation for packages (the reference app's
  * packages page was a "coming soon" stub), so this is built fresh from the
  * provided wizard screens.
@@ -9,7 +9,16 @@
 
 import { uuid } from "@/utils/uuid";
 
-export type PackageStatus = "active" | "in_active";
+export type PackageStatus = "active" | "inactive";
+
+/**
+ * Status a newly created package is saved with.
+ *
+ * New packages are drafts: the marketing site only reads "active" content,
+ * so a package stays invisible until an admin switches it on from the
+ * package list.
+ */
+export const PACKAGE_CREATION_STATUS: PackageStatus = "inactive";
 
 /**
  * One "What You Get In This Package?" entry from the wizard's Specifications

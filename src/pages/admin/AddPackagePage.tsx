@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddPackageWizard from "@/features/packages/AddPackageWizard";
+import { PACKAGE_CREATION_STATUS } from "@/features/packages/types";
 
 export default function AdminAddPackagePage() {
   const navigate = useNavigate();
@@ -21,8 +22,11 @@ export default function AdminAddPackagePage() {
       </h1>
 
       <AddPackageWizard
-        onSubmit={() => {
+        onSubmit={(values) => {
           // TODO(AWS integration): POST to admin-fn's package endpoint.
+          // Created inactive (draft) — not visible on the marketing site
+          // until an admin switches it on from the package list.
+          void { ...values, status: PACKAGE_CREATION_STATUS };
         }}
         onClose={() => navigate("/admin/packages")}
       />

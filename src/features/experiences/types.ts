@@ -14,7 +14,25 @@
  * active/inactive on-off toggle, not the property in_review/rejected cycle.
  */
 
-export type ExperienceStatus = "active" | "in_active";
+export type ExperienceStatus = "active" | "inactive";
+
+/**
+ * Status a newly created experience is saved with.
+ *
+ * New experiences are drafts: the marketing site only reads "active"
+ * content, so nothing is publicly visible until an admin explicitly
+ * switches it on from the experience list. This gives the author a chance
+ * to review copy and imagery before it goes live.
+ */
+export const EXPERIENCE_CREATION_STATUS: ExperienceStatus = "inactive";
+
+/**
+ * Image count bounds for an experience listing. Enforced by the add/edit
+ * wizard: it stops accepting files at the maximum and blocks submission
+ * below the minimum.
+ */
+export const MIN_EXPERIENCE_IMAGES = 4;
+export const MAX_EXPERIENCE_IMAGES = 25;
 
 export type ExperienceCategory =
   | "History & Culture"
@@ -42,8 +60,24 @@ export interface Experience {
   status: ExperienceStatus;
   /** First entry is the list-view thumbnail and detail hero image. */
   images: string[];
-  /** Free text, e.g. "3 Hours" or "Full Day". */
+  /** Free text, e.g. "3 Hours" or "Full Day". Display only. */
   duration: string;
+  /**
+   * The experience's actual length in minutes. Unlike `duration` (display
+   * text), this is the number the client booking flow uses: a requested
+   * slot must be exactly this long and must fit inside the daily bookable
+   * window below.
+   */
+  durationMinutes: number;
+  /**
+   * Daily bookable window, same every day, as "HH:MM" 24-hour strings.
+   * A client may request any slot of length `durationMinutes` that starts
+   * at or after `bookableFrom` and ends at or before `bookableUntil`.
+   * e.g. window 09:00–17:00 with a 180-minute duration lets a client pick
+   * 10:00–13:00, 11:30–14:30, and so on.
+   */
+  bookableFrom: string;
+  bookableUntil: string;
   /** Starting price per person, in euros. */
   pricePerPerson: number;
   maxGuests: number;
@@ -59,6 +93,9 @@ export type ExperienceFormValues = Pick<
   | "name"
   | "location"
   | "duration"
+  | "durationMinutes"
+  | "bookableFrom"
+  | "bookableUntil"
   | "pricePerPerson"
   | "maxGuests"
   | "categories"
@@ -72,6 +109,9 @@ export const EMPTY_EXPERIENCE_FORM_VALUES: ExperienceFormValues = {
   name: "",
   location: "",
   duration: "",
+  durationMinutes: 0,
+  bookableFrom: "",
+  bookableUntil: "",
   pricePerPerson: 0,
   maxGuests: 1,
   categories: [],
@@ -80,3 +120,17 @@ export const EMPTY_EXPERIENCE_FORM_VALUES: ExperienceFormValues = {
   specialRequirements: "",
   images: [],
 };
+
+/**
+ * Parse an "HH:MM" 24-hour string to minutes since midnight, or null if it
+ * is empty/malformed. Used to validate the bookable window against the
+ * experience duration.
+ */
+export function timeToMinutes(hhmm: string): number | null {
+  const match = /^(\d{1,2}):(\d{2})$/.exec(hhmm.trim());
+  if (!match) return null;
+  const hours = Number(match[1]);
+  const mins = Number(match[2]);
+  if (hours > 23 || mins > 59) return null;
+  return hours * 60 + mins;
+}

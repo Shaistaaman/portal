@@ -85,9 +85,17 @@ export default function UserForm({
       if (!values.agencyName.trim()) problems.push("Agency name is required.");
       if (!values.licenseNumber.trim())
         problems.push("License number is required.");
-      if (Number.isNaN(Number.parseFloat(values.latitude)))
+      if (!values.address.trim()) problems.push("Address is required.");
+      // Coordinates are optional, but if given must be valid numbers.
+      if (
+        values.latitude.trim() &&
+        Number.isNaN(Number.parseFloat(values.latitude))
+      )
         problems.push("Latitude must be a number.");
-      if (Number.isNaN(Number.parseFloat(values.longitude)))
+      if (
+        values.longitude.trim() &&
+        Number.isNaN(Number.parseFloat(values.longitude))
+      )
         problems.push("Longitude must be a number.");
     }
     return problems;
@@ -115,8 +123,9 @@ export default function UserForm({
 
       {mode === "add" && (
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-          New users are created with an <strong>Inactive</strong> status
-          until reviewed.
+          New users are created <strong>Inactive</strong> and cannot sign in
+          yet. Activate the account from the user list when you are ready — the
+          welcome email with sign-in details is sent at activation, not now.
         </div>
       )}
 
@@ -176,14 +185,18 @@ export default function UserForm({
         </Field>
         <Field
           label={
-            mode === "edit" ? "Password (leave empty to keep current)" : "Password"
+            mode === "edit"
+              ? "Password (leave empty to keep current)"
+              : "Password"
           }
         >
           <input
             type="password"
             value={values.password}
             onChange={(e) => update("password", e.target.value)}
-            placeholder={mode === "edit" ? "Leave empty to keep current password" : ""}
+            placeholder={
+              mode === "edit" ? "Leave empty to keep current password" : ""
+            }
             className={inputClass}
           />
         </Field>
@@ -223,20 +236,34 @@ export default function UserForm({
             />
           </Field>
 
+          <Field label="Address">
+            <input
+              type="text"
+              value={values.address}
+              onChange={(e) => update("address", e.target.value)}
+              placeholder="Via del Corso 12, 00186 Roma RM"
+              className={inputClass}
+            />
+          </Field>
+
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Latitude">
+            <Field label="Latitude (optional)">
               <input
                 type="text"
+                inputMode="decimal"
                 value={values.latitude}
                 onChange={(e) => update("latitude", e.target.value)}
+                placeholder="41.9028"
                 className={inputClass}
               />
             </Field>
-            <Field label="Longitude">
+            <Field label="Longitude (optional)">
               <input
                 type="text"
+                inputMode="decimal"
                 value={values.longitude}
                 onChange={(e) => update("longitude", e.target.value)}
+                placeholder="12.4964"
                 className={inputClass}
               />
             </Field>
@@ -254,7 +281,9 @@ export default function UserForm({
             <FileDropzone
               label="Agency License"
               preview={values.agencyLicensePreview}
-              onSelect={(file) => handleFileChange("agencyLicensePreview", file)}
+              onSelect={(file) =>
+                handleFileChange("agencyLicensePreview", file)
+              }
               onRemove={() => update("agencyLicensePreview", "")}
             />
             <FileDropzone

@@ -10,6 +10,7 @@ import {
   HandPlatter,
   Boxes,
   Info,
+  ChevronDown,
 } from "lucide-react";
 import { Calendar } from "lucide-react";
 
@@ -30,8 +31,7 @@ interface Booking {
   rating: number;
   reviews: number;
   price: number;
-  status:
-    "confirmed" | "pending_payment" | "cancelled" | "completed" | "requested";
+  status: "confirmed" | "cancelled" | "completed" | "requested";
   isWishlisted?: boolean;
 }
 
@@ -39,7 +39,7 @@ interface Booking {
 const MOCK_BOOKINGS: Booking[] = [
   {
     id: "bk-1",
-    bookingNumber: "BK-2024-001",
+    bookingNumber: "BK-2024-04-001",
     title: "Tiber Luxury Penthouse",
     type: "property",
     image:
@@ -58,7 +58,7 @@ const MOCK_BOOKINGS: Booking[] = [
   },
   {
     id: "bk-2",
-    bookingNumber: "BK-2024-002",
+    bookingNumber: "BK-2024-04-002",
     title: "Roman Golf Cart Tour",
     type: "experience",
     image:
@@ -70,12 +70,12 @@ const MOCK_BOOKINGS: Booking[] = [
     rating: 4.9,
     reviews: 336,
     price: 3750,
-    status: "pending_payment",
+    status: "confirmed",
     isWishlisted: false,
   },
   {
     id: "bk-3",
-    bookingNumber: "BK-2024-003",
+    bookingNumber: "BK-2024-04-003",
     title: "Sicily in Style",
     type: "package",
     image:
@@ -92,7 +92,7 @@ const MOCK_BOOKINGS: Booking[] = [
   },
   {
     id: "bk-4",
-    bookingNumber: "BK-2024-004",
+    bookingNumber: "BK-2024-04-004",
     title: "Tiber Luxury Penthouse",
     type: "property",
     image:
@@ -117,11 +117,6 @@ const STATUS_COLORS = {
     badge: "bg-purple-500",
     text: "text-purple-800",
   },
-  pending_payment: {
-    bg: "bg-orange-100",
-    badge: "bg-orange-500",
-    text: "text-orange-800",
-  },
   confirmed: {
     bg: "bg-green-100",
     badge: "bg-green-500",
@@ -133,13 +128,12 @@ const STATUS_COLORS = {
 
 const STATUS_LABELS = {
   requested: "Requested",
-  pending_payment: "Pending Payment",
   confirmed: "Confirmed",
   completed: "Completed",
   cancelled: "Cancelled",
 };
 
-type FilterType = "all" | "property" | "experience" | "package" | "status";
+type FilterType = "all" | "property" | "experience" | "package";
 
 export default function ClientBookingsPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -151,17 +145,18 @@ export default function ClientBookingsPage() {
 
   const ITEMS_PER_PAGE = 6;
 
-  // Filter bookings
+  // Type and Status are two independent filters, combined with AND:
+  //  - a booking must match the selected type (unless "all"), and
+  //  - it must match the selected status (unless none is selected).
+  // So e.g. Properties + Confirmed shows only confirmed property bookings.
   const filteredBookings = useMemo(() => {
     return MOCK_BOOKINGS.filter((booking) => {
-      if (activeFilter === "all") {
-        return selectedStatus ? booking.status === selectedStatus : true;
-      }
-      if (activeFilter === "status") {
-        // When in status filter, selectedStatus=null means show ALL statuses
-        return selectedStatus ? booking.status === selectedStatus : true;
-      }
-      return booking.type === activeFilter;
+      const matchesType =
+        activeFilter === "all" || booking.type === activeFilter;
+      const matchesStatus = selectedStatus
+        ? booking.status === selectedStatus
+        : true;
+      return matchesType && matchesStatus;
     });
   }, [activeFilter, selectedStatus]);
 
@@ -209,7 +204,6 @@ export default function ClientBookingsPage() {
         <button
           onClick={() => {
             setActiveFilter("all");
-            setSelectedStatus(null);
             setCurrentPage(1);
           }}
           className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all cursor-pointer flex items-center gap-2 ${
@@ -225,7 +219,6 @@ export default function ClientBookingsPage() {
         <button
           onClick={() => {
             setActiveFilter("property");
-            setSelectedStatus(null);
             setCurrentPage(1);
           }}
           className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all cursor-pointer flex items-center gap-2 ${
@@ -241,7 +234,6 @@ export default function ClientBookingsPage() {
         <button
           onClick={() => {
             setActiveFilter("experience");
-            setSelectedStatus(null);
             setCurrentPage(1);
           }}
           className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all cursor-pointer flex items-center gap-2 ${
@@ -257,7 +249,6 @@ export default function ClientBookingsPage() {
         <button
           onClick={() => {
             setActiveFilter("package");
-            setSelectedStatus(null);
             setCurrentPage(1);
           }}
           className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all cursor-pointer flex items-center gap-2 ${
@@ -270,58 +261,33 @@ export default function ClientBookingsPage() {
           Packages
         </button>
 
-        <button
-          onClick={() => {
-            setActiveFilter("status");
-            setCurrentPage(1);
-          }}
-          className={`px-4 py-2.5 rounded-lg font-medium text-sm transition-all cursor-pointer flex items-center gap-2 ${
-            activeFilter === "status"
-              ? "bg-neutral-900 text-white"
-              : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
-          }`}
-        >
-          <Info className="w-5 h-5" />
-          Status
-        </button>
-      </div>
-
-      {/* Status Filter (if status tab selected) */}
-      {activeFilter === "status" && (
-        <div className="mb-8 flex flex-wrap gap-2">
-          <button
-            onClick={() => {
-              setSelectedStatus(null);
+        {/* Status is a dropdown, combined (AND) with the type tabs above. */}
+        <div className="relative ml-auto">
+          <Info className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+          <select
+            value={selectedStatus ?? "all"}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedStatus(
+                value === "all" ? null : (value as keyof typeof STATUS_LABELS),
+              );
               setCurrentPage(1);
             }}
-            className={`px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer ${
-              selectedStatus === null
-                ? "bg-neutral-900 text-white"
-                : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-            }`}
+            aria-label="Filter bookings by status"
+            className="appearance-none pl-9 pr-9 py-2.5 rounded-lg font-medium text-sm bg-neutral-100 text-neutral-900 hover:bg-neutral-200 focus:outline-none focus:ring-1 focus:ring-black transition cursor-pointer"
           >
-            All
-          </button>
-          {(
-            Object.keys(STATUS_LABELS) as Array<keyof typeof STATUS_LABELS>
-          ).map((status) => (
-            <button
-              key={status}
-              onClick={() => {
-                setSelectedStatus(selectedStatus === status ? null : status);
-                setCurrentPage(1);
-              }}
-              className={`px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer ${
-                selectedStatus === status
-                  ? `${STATUS_COLORS[status as keyof typeof STATUS_COLORS].badge} text-white`
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-              }`}
-            >
-              {STATUS_LABELS[status]}
-            </button>
-          ))}
+            <option value="all">All Statuses</option>
+            {(
+              Object.keys(STATUS_LABELS) as Array<keyof typeof STATUS_LABELS>
+            ).map((status) => (
+              <option key={status} value={status}>
+                {STATUS_LABELS[status]}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none" />
         </div>
-      )}
+      </div>
 
       {/* Bookings List */}
       <div className="space-y-6">

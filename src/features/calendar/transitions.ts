@@ -9,14 +9,32 @@ import { isCheckoutPassed } from "./types";
  * given role may move this booking to (excluding its current status).
  *
  * Summary:
- *  - payment_pending → confirmed | cancelled_refunded   (admin only)
- *  - confirmed       → completed                        (all roles, checkout passed)
- *  - confirmed       → no_show                          (admin only, checkout passed)
- *  - no_show         → cancelled_refunded               (admin only)
+ *  - requested → per REQUESTED_TARGETS_BY_TYPE               (admin only)
+ *  - confirmed → cancelled                                  (admin only, any time)
+ *  - confirmed → completed | no_show                        (admin only, once checkout passed;
+ *                                                            completed also available to all roles)
+ *  - no_show   → cancelled                                  (admin only)
  *    (no_show → reschedule is handled as a separate action, not a status
- *     dropdown value — it reopens a new payment_pending booking)
- *  - blocked, completed, cancelled_refunded → terminal (no dropdown targets)
+ *     dropdown value — it reopens a new requested booking)
+ *  - blocked, completed, cancelled → terminal (no dropdown targets)
  */
+
+/**
+ * Where an admin may take a "requested" booking, by booking type.
+ *
+ * There is no payment-pending step: a guest or self request is approved
+ * straight to `confirmed`, and a maintenance request to `blocked`. Any of
+ * the three can instead be rejected, which uses `cancelled`.
+ */
+const REQUESTED_TARGETS_BY_TYPE: Record<
+  Booking["bookingType"],
+  BookingStatus[]
+> = {
+  guest: ["confirmed", "cancelled"],
+  self: ["confirmed", "cancelled"],
+  maintenance: ["blocked", "cancelled"],
+};
+
 export function allowedTransitions(
   booking: Booking,
   role: UserRole,
@@ -24,19 +42,23 @@ export function allowedTransitions(
   const checkoutPassed = isCheckoutPassed(booking.checkOut);
 
   switch (booking.status) {
-    case "payment_pending":
-      return role === "admin" ? ["confirmed", "cancelled_refunded"] : [];
+    case "requested":
+      return role === "admin"
+        ? (REQUESTED_TARGETS_BY_TYPE[booking.bookingType] ?? [])
+        : [];
     case "confirmed": {
-      if (!checkoutPassed) return [];
-      // All roles can mark Completed once checkout has passed; only admin
-      // can additionally mark No-Show.
-      return role === "admin" ? ["completed", "no_show"] : ["completed"];
+      // A confirmed booking can be cancelled at any time. Once checkout has
+      // passed it can additionally be completed (all roles) or, admin only,
+      // marked no-show.
+      if (role !== "admin") return checkoutPassed ? ["completed"] : [];
+      if (!checkoutPassed) return ["cancelled"];
+      return ["completed", "no_show", "cancelled"];
     }
     case "no_show":
-      return role === "admin" ? ["cancelled_refunded"] : [];
+      return role === "admin" ? ["cancelled"] : [];
     case "blocked":
     case "completed":
-    case "cancelled_refunded":
+    case "cancelled":
     default:
       return [];
   }
@@ -44,9 +66,9 @@ export function allowedTransitions(
 
 /**
  * No-Show reschedule is admin-only and, unlike a status change, creates a
- * fresh booking back at payment_pending with new dates (prices may have
- * risen — the guest is re-charged). This just reports whether the action
- * is available to the current role for the given booking.
+ * fresh booking back at `requested` with new dates (prices may have risen —
+ * the guest is re-charged). This just reports whether the action is
+ * available to the current role for the given booking.
  */
 export function canReschedule(booking: Booking, role: UserRole): boolean {
   return role === "admin" && booking.status === "no_show";

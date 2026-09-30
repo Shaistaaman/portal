@@ -1,13 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import UserForm from "@/features/user-management/UserForm";
+import {
+  USER_CREATION_STATUS,
+  type ManagedUserStatus,
+  type UserFormValues,
+} from "@/features/user-management/types";
 
 export default function AddUserPage() {
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
+  const handleSubmit = (values: UserFormValues, status: ManagedUserStatus) => {
     // TODO(AWS integration): POST to admin-fn's user-creation endpoint.
-    // New users default to "Inactive" per the info banner in UserForm.
+    // `status` comes from the form's toggle, which defaults to
+    // USER_CREATION_STATUS ("active") — an admin may deliberately create a
+    // dormant account instead. Previously this callback took no arguments
+    // and silently dropped the chosen status.
+    void { ...values, status };
     navigate("/admin/user-management");
   };
 
@@ -28,6 +37,7 @@ export default function AddUserPage() {
 
       <UserForm
         mode="add"
+        initialStatus={USER_CREATION_STATUS}
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/user-management")}
       />

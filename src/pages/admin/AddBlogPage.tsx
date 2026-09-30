@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddBlogWizard from "@/features/blogs/AddBlogWizard";
+import { BLOG_CREATION_STATUS } from "@/features/blogs/types";
 
 export default function AdminAddBlogPage() {
   const navigate = useNavigate();
@@ -19,8 +20,11 @@ export default function AdminAddBlogPage() {
       <h1 className="text-3xl font-semibold text-neutral-950 mb-8">Add Blog</h1>
 
       <AddBlogWizard
-        onSubmit={() => {
+        onSubmit={(values) => {
           // TODO(AWS integration): POST to admin-fn's blog endpoint.
+          // Created inactive (draft) with publishedAt left unset — the
+          // timestamp is stamped when the post is first activated.
+          void { ...values, status: BLOG_CREATION_STATUS, publishedAt: null };
         }}
         onClose={() => navigate("/admin/blogs")}
       />

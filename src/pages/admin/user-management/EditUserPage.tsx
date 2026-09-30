@@ -63,6 +63,7 @@ export default function EditUserPage() {
           agencyName: user.agencyName ?? "",
           licenseNumber: user.licenseNumber ?? "",
           aboutAgency: user.aboutAgency ?? "",
+          address: user.address ?? "",
           latitude: user.latitude ?? "",
           longitude: user.longitude ?? "",
           agencyLicensePreview: user.agencyLicensePreview ?? "",

@@ -47,11 +47,13 @@ export default function AdminEditPropertyPage() {
         initialValues={property}
         initialManagementLevel={property.managementLevel}
         initialIsFeatured={property.isFeatured}
+        initialOwnerId={property.ownerId}
         onSubmit={() => {
           // TODO(AWS integration): PATCH admin-fn's property endpoint.
           // Per Project_Specification.md §4, editing resets status to
           // "in_review" (except a plain active/inactive toggle, which
-          // isn't done through this form). isFeatured is admin-only.
+          // isn't done through this form). isFeatured and ownerId are
+          // admin-only and arrive in the second argument.
         }}
         onClose={() => navigate("/admin/properties")}
       />

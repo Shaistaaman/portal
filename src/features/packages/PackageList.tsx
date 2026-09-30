@@ -19,12 +19,12 @@ const ITEMS_PER_PAGE = 5;
 
 const STATUS_STYLES: Record<PackageStatus, string> = {
   active: "bg-green-100 text-green-800",
-  in_active: "bg-blue-100 text-blue-800",
+  inactive: "bg-blue-100 text-blue-800",
 };
 
 const STATUS_LABELS: Record<PackageStatus, string> = {
   active: "Active",
-  in_active: "In Active",
+  inactive: "Inactive",
 };
 
 function StatusBadge({ status }: { status: PackageStatus }) {
@@ -40,7 +40,7 @@ function StatusBadge({ status }: { status: PackageStatus }) {
 /**
  * Admin-only packages list + detail view, mirroring ExperienceList.
  * Packages are admin-exclusive (Project_Specification.md §3), so there is
- * no role prop; status is a plain active/in_active toggle with no approval
+ * no role prop; status is a plain active/inactive toggle with no approval
  * workflow. Built fresh from the package wizard reference designs.
  */
 export default function PackageList() {
@@ -78,7 +78,7 @@ export default function PackageList() {
     setPackages((current) =>
       current.map((p) =>
         p.id === selectedPackage.id
-          ? { ...p, status: p.status === "active" ? "in_active" : "active" }
+          ? { ...p, status: p.status === "active" ? "inactive" : "active" }
           : p,
       ),
     );
@@ -352,7 +352,7 @@ export default function PackageList() {
         <ConfirmModal
           title="Package Status Change"
           message={`Change this package's status to "${
-            selectedPackage.status === "active" ? "In Active" : "Active"
+            selectedPackage.status === "active" ? "Inactive" : "Active"
           }"?`}
           confirmLabel="Confirm"
           onCancel={() => setPendingStatusToggle(false)}

@@ -146,7 +146,7 @@ export const MOCK_PROPERTIES: Property[] = [
     location: "Sicily, Italy",
     description:
       "A restored 19th-century masseria surrounded by olive groves, with an orchard, wood-fired oven, and staff quarters.",
-    status: "in_inactive",
+    status: "inactive",
     propertyType: "villa",
     managementLevel: "full-service",
     bedrooms: 8,

@@ -6,7 +6,7 @@ import WhatsAppFloatingButton from "@/components/ui/WhatsAppFloatingButton";
 import MobileMenu from "@/components/layout/admin/MobileMenu";
 import NotificationPopup from "@/components/layout/admin/NotificationPopup";
 import { useAuth } from "@/auth/useAuth";
-import { getWhatsAppSupportLink } from "@/utils/whatsapp";
+import { openWhatsAppPopup } from "@/utils/whatsapp";
 
 export default function ClientLayout() {
   const location = useLocation();
@@ -221,11 +221,13 @@ function ProfileMenuClient({
             </svg>
             Settings
           </button>
-          <a
-            href={getWhatsAppSupportLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer block"
+          <button
+            type="button"
+            onClick={() => {
+              openWhatsAppPopup();
+              onClose();
+            }}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
           >
             <svg
               className="w-4 h-4 text-green-500 shrink-0"
@@ -235,7 +237,7 @@ function ProfileMenuClient({
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.869 1.23c-2.868 1.684-4.74 5.063-4.74 8.498 0 .71.109 1.417.32 2.102l.54 1.713-1.823.909 1.542-4.431c.151.58.433 1.159.873 1.697 1.816 2.26 5.152 3.595 8.157 3.595 4.443 0 8.05-2.468 8.05-5.5 0-1.312-.308-2.569-.89-3.723-1.385-2.773-4.157-4.691-7.158-4.691z" />
             </svg>
             Contact Support (WhatsApp)
-          </a>
+          </button>
         </div>
 
         <div className="border-t border-neutral-100 p-2">

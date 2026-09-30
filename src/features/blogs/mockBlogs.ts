@@ -10,6 +10,7 @@ export const MOCK_BLOGS: Blog[] = [
     title: "A Weekend in Eternal Rome",
     subtitle: "How to experience the city like a local, beyond the crowds.",
     status: "active",
+    publishedAt: "2026-07-14T09:00:00.000Z",
     bannerImage:
       "https://images.pexels.com/photos/2064827/pexels-photo-2064827.jpeg?auto=compress&cs=tinysrgb&w=1200",
     highlights: [
@@ -34,6 +35,7 @@ export const MOCK_BLOGS: Blog[] = [
     title: "The Quiet Luxury of the Amalfi Coast",
     subtitle: "Slow travel along Italy's most storied coastline.",
     status: "active",
+    publishedAt: "2026-08-22T09:00:00.000Z",
     bannerImage:
       "https://images.pexels.com/photos/1430677/pexels-photo-1430677.jpeg?auto=compress&cs=tinysrgb&w=1200",
     highlights: [
@@ -56,7 +58,9 @@ export const MOCK_BLOGS: Blog[] = [
     id: "3",
     title: "Baroque Sicily, Town by Town",
     subtitle: "A route through the south-east's golden-stone cities.",
-    status: "in_active",
+    status: "inactive",
+    // Never activated, so it has no publication date yet.
+    publishedAt: null,
     bannerImage:
       "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=1200",
     highlights: [

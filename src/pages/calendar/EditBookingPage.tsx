@@ -23,7 +23,7 @@ const DEMO_OWNER_ID = "2";
  * Shared edit-booking page for admin/owner/agent. Renders the prefilled
  * BookingForm plus a status panel whose available transitions are gated by
  * role + checkout date (see transitions.ts). Admin-only No-Show reschedule
- * (reopens as a fresh payment_pending booking) and refund actions. Edit/
+ * (reopens as a fresh requested booking) and refund actions. Edit/
  * delete access is gated by canEditBooking.
  */
 export default function EditBookingPage({ role }: { role: UserRole }) {
@@ -176,7 +176,7 @@ export default function EditBookingPage({ role }: { role: UserRole }) {
           title={`Mark ${BOOKING_STATUS_LABELS[pendingTransition]}?`}
           message={`This booking's status will change to "${BOOKING_STATUS_LABELS[pendingTransition]}".`}
           confirmLabel="Confirm"
-          destructive={pendingTransition === "cancelled_refunded"}
+          destructive={pendingTransition === "cancelled"}
           onCancel={() => setPendingTransition(null)}
           onConfirm={applyTransition}
         />

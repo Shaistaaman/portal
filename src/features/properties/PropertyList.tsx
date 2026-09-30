@@ -38,14 +38,14 @@ const DEMO_OWNER_ID = "2";
 const STATUS_STYLES: Record<PropertyStatus, string> = {
   active: "bg-green-100 text-green-800",
   in_review: "bg-orange-100 text-orange-800",
-  in_inactive: "bg-blue-100 text-blue-800",
+  inactive: "bg-blue-100 text-blue-800",
   rejected: "bg-red-100 text-red-800",
 };
 
 const STATUS_LABELS: Record<PropertyStatus, string> = {
   active: "Active",
   in_review: "In Review",
-  in_inactive: "In Inactive",
+  inactive: "Inactive",
   rejected: "Rejected",
 };
 
@@ -164,6 +164,12 @@ export default function PropertyList({ role }: { role: PropertyListRole }) {
                 statusChange.newStatus === "rejected"
                   ? statusChange.rejectionReason
                   : undefined,
+              // Only active listings can be featured, so leaving `active`
+              // (e.g. deactivating) clears the flag — otherwise a property
+              // would stay featured with no way to un-feature it, since the
+              // Feature action only shows while active.
+              isFeatured:
+                statusChange.newStatus === "active" ? p.isFeatured : false,
             }
           : p,
       ),
@@ -354,26 +360,32 @@ export default function PropertyList({ role }: { role: PropertyListRole }) {
                         ? "Edit (In Review)"
                         : "Manage Property"}
                     </button>
-                    {role === "admin" && (
-                      <button
-                        type="button"
-                        onClick={toggleFeatured}
-                        className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
-                      >
-                        {selectedProperty.isFeatured ? (
-                          "Un-feature"
-                        ) : (
-                          <>
-                            Feature{" "}
-                            <span className="text-neutral-400">
-                              ({featuredCountByCity(selectedProperty.location)}/
-                              {MAX_FEATURED_PER_CITY} in{" "}
-                              {selectedProperty.location})
-                            </span>
-                          </>
-                        )}
-                      </button>
-                    )}
+                    {/* Feature/Un-feature only applies to a live (active)
+                        listing — the marketing site only surfaces active
+                        properties, so featuring an inactive/in-review/rejected
+                        one is meaningless. Hidden entirely otherwise. */}
+                    {role === "admin" &&
+                      selectedProperty.status === "active" && (
+                        <button
+                          type="button"
+                          onClick={toggleFeatured}
+                          className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                        >
+                          {selectedProperty.isFeatured ? (
+                            "Un-feature"
+                          ) : (
+                            <>
+                              Feature{" "}
+                              <span className="text-neutral-400">
+                                (
+                                {featuredCountByCity(selectedProperty.location)}
+                                /{MAX_FEATURED_PER_CITY} in{" "}
+                                {selectedProperty.location})
+                              </span>
+                            </>
+                          )}
+                        </button>
+                      )}
                     <div className="border-t border-neutral-100" />
 
                     {role === "admin" &&
@@ -397,13 +409,13 @@ export default function PropertyList({ role }: { role: PropertyListRole }) {
                       )}
 
                     {(selectedProperty.status === "active" ||
-                      selectedProperty.status === "in_inactive") && (
+                      selectedProperty.status === "inactive") && (
                       <button
                         type="button"
                         onClick={() =>
                           openStatusChange(
                             selectedProperty.status === "active"
-                              ? "in_inactive"
+                              ? "inactive"
                               : "active",
                           )
                         }

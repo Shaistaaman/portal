@@ -44,18 +44,6 @@ export default function AccountSettings({ role }: { role: UserRole }) {
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const [notifications, setNotifications] = useState({
-    email: true,
-  });
-
-  // Admin-only org-level booking fees, applied to booking price estimates
-  // (base price x nights + these). See Project_Specification.md §4.5.
-  const [fees, setFees] = useState({
-    cleaningFee: "150",
-    serviceFee: "75",
-    taxesPct: "10",
-  });
-
   const [savedSection, setSavedSection] = useState<string | null>(null);
 
   const flashSaved = (section: string) => {
@@ -273,88 +261,6 @@ export default function AccountSettings({ role }: { role: UserRole }) {
           <SaveButton>Update Password</SaveButton>
         </form>
       </Section>
-
-      {/* Notifications */}
-      <Section
-        title="Notification Preferences"
-        description="Choose how Skylife contacts you."
-        saved={savedSection === "notifications"}
-      >
-        <div className="space-y-3">
-          <ToggleRow
-            label="Email notifications"
-            description="Booking updates, approvals, and account activity."
-            checked={notifications.email}
-            onChange={(v) => setNotifications({ ...notifications, email: v })}
-          />
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => flashSaved("notifications")}
-              className="px-5 py-2.5 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
-            >
-              Save Preferences
-            </button>
-          </div>
-        </div>
-      </Section>
-
-      {/* Admin-only: Booking Fees (applied to booking price estimates) */}
-      {role === "admin" && (
-        <Section
-          title="Booking Fees"
-          description="Org-level fees added on top of a property's nightly rate when estimating a booking total. Admins only."
-          saved={savedSection === "fees"}
-        >
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <Field label="Cleaning Fee ($)">
-                <input
-                  type="number"
-                  value={fees.cleaningFee}
-                  onChange={(e) =>
-                    setFees({ ...fees, cleaningFee: e.target.value })
-                  }
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Service Fee ($)">
-                <input
-                  type="number"
-                  value={fees.serviceFee}
-                  onChange={(e) =>
-                    setFees({ ...fees, serviceFee: e.target.value })
-                  }
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Taxes (%)">
-                <input
-                  type="number"
-                  value={fees.taxesPct}
-                  onChange={(e) =>
-                    setFees({ ...fees, taxesPct: e.target.value })
-                  }
-                  className={inputClass}
-                />
-              </Field>
-            </div>
-            <p className="text-xs text-neutral-500">
-              Booking total = (nightly rate × nights) + cleaning fee + service
-              fee + taxes.
-            </p>
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => flashSaved("fees")}
-                className="px-5 py-2.5 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
-              >
-                Save Booking Fees
-              </button>
-            </div>
-          </div>
-        </Section>
-      )}
     </div>
   );
 }
@@ -416,46 +322,5 @@ function SaveButton({ children }: { children: React.ReactNode }) {
     >
       {children}
     </button>
-  );
-}
-
-function ToggleRow({
-  label,
-  description,
-  checked,
-  onChange,
-}: {
-  label: string;
-  description: string;
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}) {
-  return (
-    <label className="flex items-start justify-between gap-4 cursor-pointer">
-      <span>
-        <span className="block text-sm font-medium text-neutral-900">
-          {label}
-        </span>
-        <span className="block text-xs text-neutral-500 mt-0.5">
-          {description}
-        </span>
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
-        onClick={() => onChange(!checked)}
-        className={`relative shrink-0 w-11 h-6 rounded-full transition-colors cursor-pointer ${
-          checked ? "bg-black" : "bg-neutral-300"
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-            checked ? "translate-x-5" : ""
-          }`}
-        />
-      </button>
-    </label>
   );
 }

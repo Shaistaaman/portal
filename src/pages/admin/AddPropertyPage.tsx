@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddPropertyWizard from "@/features/properties/AddPropertyWizard";
+import { PROPERTY_CREATION_STATUS } from "@/features/properties/types";
 
 export default function AdminAddPropertyPage() {
   const navigate = useNavigate();
@@ -22,10 +23,17 @@ export default function AdminAddPropertyPage() {
 
       <AddPropertyWizard
         role="admin"
-        onSubmit={() => {
+        onSubmit={(values, adminFields) => {
           // TODO(AWS integration): POST to admin-fn's property-creation
-          // endpoint. New properties are created in "in_review" status
-          // per Project_Specification.md §4.
+          // endpoint. Created in "in_review" even when an admin submits it,
+          // per Project_Specification.md §4 — approval is a separate action.
+          // adminFields (isFeatured, ownerId) must be re-authorized
+          // server-side against the Cognito group claim.
+          void {
+            ...values,
+            ...adminFields,
+            status: PROPERTY_CREATION_STATUS,
+          };
         }}
         onClose={() => navigate("/admin/properties")}
       />

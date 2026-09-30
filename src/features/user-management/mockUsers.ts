@@ -43,6 +43,7 @@ export const MOCK_USERS: ManagedUser[] = [
     licenseNumber: "AG-2024-00317",
     aboutAgency:
       "Boutique agency specializing in luxury coastal and countryside properties across Tuscany.",
+    address: "Via de' Tornabuoni 5, 50123 Firenze FI",
     latitude: "43.7696",
     longitude: "11.2558",
     rejectionReason:
@@ -90,6 +91,7 @@ export const MOCK_USERS: ManagedUser[] = [
     agencyName: "Moretti & Partners",
     licenseNumber: "AG-2023-00142",
     aboutAgency: "Full-service agency covering the Amalfi Coast.",
+    address: "Via Roma 28, 84017 Positano SA",
     latitude: "40.6333",
     longitude: "14.6029",
   },

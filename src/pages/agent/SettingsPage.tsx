@@ -13,7 +13,7 @@ import {
  * - Photo (upload)
  * - Full Name, Email, Phone
  * - Agency Name, License Number, About Agency
- * - Latitude, Longitude (with map preview)
+ * - Address (required), Latitude, Longitude (optional, with map preview)
  * - Agency License, Brand Logo (file uploads)
  *
  * "I Confirm" button marks profile complete, enables menu items, redirects to dashboard.
@@ -30,6 +30,7 @@ interface AgentProfileForm {
   agencyName: string;
   licenseNumber: string;
   aboutAgency: string;
+  address: string;
   latitude: string;
   longitude: string;
   agencyLicensePreview: string;
@@ -45,6 +46,7 @@ const DEMO_AGENT_DATA: AgentProfileForm = {
   agencyName: "Bianchi Travel & Booking Agency",
   licenseNumber: "IT-AGENT-2023-001",
   aboutAgency: "Premium travel and booking services across Europe.",
+  address: "Corso Buenos Aires 33, 20124 Milano MI",
   latitude: "45.4642",
   longitude: "9.1900",
   agencyLicensePreview: "",
@@ -107,9 +109,17 @@ export default function AgentSettingsPage() {
     if (!values.agencyName.trim()) problems.push("Agency name is required.");
     if (!values.licenseNumber.trim())
       problems.push("License number is required.");
-    if (Number.isNaN(Number.parseFloat(values.latitude)))
+    if (!values.address.trim()) problems.push("Address is required.");
+    // Coordinates are optional, but if provided must be valid numbers.
+    if (
+      values.latitude.trim() &&
+      Number.isNaN(Number.parseFloat(values.latitude))
+    )
       problems.push("Latitude must be a number.");
-    if (Number.isNaN(Number.parseFloat(values.longitude)))
+    if (
+      values.longitude.trim() &&
+      Number.isNaN(Number.parseFloat(values.longitude))
+    )
       problems.push("Longitude must be a number.");
     return problems;
   };
@@ -269,20 +279,34 @@ export default function AgentSettingsPage() {
               Agency Location
             </h2>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <Field label="Latitude">
+            <Field label="Address">
+              <input
+                type="text"
+                value={values.address}
+                onChange={(e) => update("address", e.target.value)}
+                placeholder="Corso Buenos Aires 33, 20124 Milano MI"
+                className={inputClass}
+              />
+            </Field>
+
+            <div className="grid grid-cols-2 gap-4 mt-4 mb-4">
+              <Field label="Latitude (optional)">
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={values.latitude}
                   onChange={(e) => update("latitude", e.target.value)}
+                  placeholder="45.4642"
                   className={inputClass}
                 />
               </Field>
-              <Field label="Longitude">
+              <Field label="Longitude (optional)">
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={values.longitude}
                   onChange={(e) => update("longitude", e.target.value)}
+                  placeholder="9.1900"
                   className={inputClass}
                 />
               </Field>

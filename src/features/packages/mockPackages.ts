@@ -71,7 +71,7 @@ export const MOCK_PACKAGES: Package[] = [
   {
     id: "3",
     name: "Amalfi Coast Escape",
-    status: "in_active",
+    status: "inactive",
     duration: "5 Days",
     basePrice: 9800,
     guestCapacity: 2,

@@ -3,14 +3,14 @@ import type { UserRole } from "@/types/auth";
 /**
  * Booking status model — see Project_Specification.md §4.5. Six states with
  * role- and date-gated manual transitions.
+ *
+ * There is no payment-pending state: the model is request-to-book, so a
+ * booking goes straight from `requested` to `confirmed` on approval. The
+ * cancel state is a plain `cancelled` (spelled the same way everywhere,
+ * including the client bookings view).
  */
 export type BookingStatus =
-  | "payment_pending"
-  | "confirmed"
-  | "blocked"
-  | "completed"
-  | "no_show"
-  | "cancelled_refunded";
+  "requested" | "confirmed" | "blocked" | "completed" | "no_show" | "cancelled";
 
 /**
  * What a booking represents. The available set is filtered per role in the
@@ -42,15 +42,22 @@ export interface Booking {
   nightlyRate: number;
   /** Which role created the booking — used to gate agent edit scope. */
   createdByRole: UserRole;
+  /**
+   * Display name of whoever created the booking (the staff member or client,
+   * not the guest). Shown in the admin dashboard's "Booked By" column beneath
+   * the creating role. For a guest booking this is the agent/admin who made
+   * it, distinct from `guestName`.
+   */
+  createdByName: string;
 }
 
 export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
-  payment_pending: "Payment Pending",
+  requested: "Requested",
   confirmed: "Confirmed",
   blocked: "Blocked",
   completed: "Completed",
   no_show: "No-Show",
-  cancelled_refunded: "Cancelled / Refunded",
+  cancelled: "Cancelled",
 };
 
 /** Legend/badge colors. Solid dot + block fill classes. */
@@ -58,17 +65,17 @@ export const BOOKING_STATUS_COLORS: Record<
   BookingStatus,
   { dot: string; block: string; text: string; cell: string }
 > = {
+  requested: {
+    dot: "bg-purple-500",
+    block: "bg-purple-500 text-white",
+    text: "text-purple-800",
+    cell: "bg-purple-50",
+  },
   confirmed: {
     dot: "bg-green-500",
     block: "bg-green-500 text-white",
     text: "text-green-800",
     cell: "bg-green-50",
-  },
-  payment_pending: {
-    dot: "bg-orange-500",
-    block: "bg-orange-500 text-white",
-    text: "text-orange-800",
-    cell: "bg-orange-50",
   },
   blocked: {
     dot: "bg-red-500",
@@ -88,7 +95,7 @@ export const BOOKING_STATUS_COLORS: Record<
     text: "text-slate-700",
     cell: "bg-slate-50",
   },
-  cancelled_refunded: {
+  cancelled: {
     dot: "bg-neutral-800",
     block: "bg-neutral-800 text-white line-through",
     text: "text-neutral-700",
@@ -96,10 +103,14 @@ export const BOOKING_STATUS_COLORS: Record<
   },
 };
 
-/** The statuses shown in the top-of-calendar legend (the primary four). */
+/**
+ * The statuses shown in the top-of-calendar legend. `requested` leads
+ * because every new booking now starts there, so it is the status a user
+ * sees most often on a fresh calendar.
+ */
 export const CALENDAR_LEGEND_STATUSES: BookingStatus[] = [
+  "requested",
   "confirmed",
-  "payment_pending",
   "blocked",
   "completed",
 ];
@@ -117,12 +128,19 @@ export const BOOKING_TYPE_LABELS: Record<BookingType, string> = {
   maintenance: "Maintenance",
 };
 
-/** Initial status a new booking is created with, keyed by its type. */
-export const INITIAL_STATUS_BY_TYPE: Record<BookingType, BookingStatus> = {
-  guest: "payment_pending",
-  self: "confirmed",
-  maintenance: "blocked",
-};
+/**
+ * Every new booking starts as "requested", regardless of its type (self,
+ * guest or maintenance) and regardless of which role created it. Approval
+ * is a separate, explicit admin action — see allowedTransitions() in
+ * ./transitions.ts for where it goes next.
+ *
+ * This replaces an earlier INITIAL_STATUS_BY_TYPE map that started each
+ * type in a different state (self → confirmed, maintenance → blocked), i.e.
+ * self and maintenance bookings were implicitly pre-approved at creation. A
+ * single entry state keeps the request-to-book model consistent: nothing is
+ * confirmed until someone confirms it.
+ */
+export const BOOKING_CREATION_STATUS: BookingStatus = "requested";
 
 /** The editable fields captured by BookingForm (add + edit). */
 export interface BookingFormValues {
@@ -151,6 +169,58 @@ export function emptyBookingFormValues(role: UserRole): BookingFormValues {
     children: 0,
     maintenanceNote: "",
   };
+}
+
+/**
+ * Human-facing Booking Number, matching the client "My Bookings" format:
+ * `BK-YYYY-MM-NNN` — e.g. BK-2024-01-001.
+ *
+ *  - YYYY / MM come from the booking's check-in date (the month the stay
+ *    falls in), so the number is stable and meaningful.
+ *  - NNN is the booking's sequence within that month, zero-padded to three.
+ *    The caller supplies it because sequence depends on the whole dataset,
+ *    not one booking; see `bookingNumbers()` below, which computes them all.
+ *
+ * This is a pure formatter. Prefer `bookingNumbers(list)` to get a lookup
+ * for a set of bookings; use this directly only when the sequence is known.
+ */
+export function formatBookingNumber(checkIn: string, sequence: number): string {
+  const d = new Date(checkIn);
+  const year = Number.isNaN(d.getTime())
+    ? new Date().getFullYear()
+    : d.getFullYear();
+  const month = Number.isNaN(d.getTime()) ? 1 : d.getMonth() + 1;
+  return `BK-${year}-${String(month).padStart(2, "0")}-${String(sequence).padStart(3, "0")}`;
+}
+
+/**
+ * Build a { bookingId -> "BK-YYYY-MM-NNN" } map for a list of bookings.
+ * Sequence is assigned per year-month in check-in chronological order, so a
+ * given booking always gets the same number regardless of how the list is
+ * filtered or sorted for display.
+ *
+ * In production the booking number is assigned and stored server-side at
+ * creation (see Documents/database-design.md §2.10); this derives it for the
+ * mocked dataset.
+ */
+export function bookingNumbers(
+  bookings: { id: string; checkIn: string }[],
+): Record<string, string> {
+  const chronological = [...bookings].sort(
+    (a, b) => new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime(),
+  );
+  const counters = new Map<string, number>();
+  const result: Record<string, string> = {};
+  for (const b of chronological) {
+    const d = new Date(b.checkIn);
+    const key = Number.isNaN(d.getTime())
+      ? "0000-00"
+      : `${d.getFullYear()}-${d.getMonth() + 1}`;
+    const next = (counters.get(key) ?? 0) + 1;
+    counters.set(key, next);
+    result[b.id] = formatBookingNumber(b.checkIn, next);
+  }
+  return result;
 }
 
 /** Whole-day count between check-in (inclusive) and check-out (exclusive). */

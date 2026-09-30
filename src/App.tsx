@@ -35,6 +35,7 @@ import AdminAddFinancialRecordPage from "@/pages/admin/AddFinancialRecordPage";
 import AdminNotificationsPage from "@/pages/admin/NotificationsPage";
 import AddBookingPage from "@/pages/calendar/AddBookingPage";
 import EditBookingPage from "@/pages/calendar/EditBookingPage";
+import AdminBookingsPage from "@/pages/admin/BookingsPage";
 import {
   StandaloneAddBookingPage,
   StandaloneEditBookingPage,
@@ -144,6 +145,7 @@ function App() {
               path="packages/:id/edit"
               element={<AdminEditPackagePage />}
             />
+            <Route path="bookings" element={<AdminBookingsPage />} />
             <Route path="calendar" element={<AdminCalendarPage />} />
             <Route
               path="calendar/add-booking"

@@ -1,7 +1,7 @@
 import { X, MessageCircle, Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/useAuth";
-import { getWhatsAppSupportLink } from "@/utils/whatsapp";
+import { openWhatsAppPopup } from "@/utils/whatsapp";
 
 interface ProfileMenuProps {
   onClose: () => void;
@@ -70,15 +70,17 @@ export default function ProfileMenu({
             <Settings className="w-4 h-4 text-neutral-500 shrink-0" />
             Settings
           </button>
-          <a
-            href={getWhatsAppSupportLink()}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => {
+              openWhatsAppPopup();
+              onClose();
+            }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
           >
             <MessageCircle className="w-4 h-4 text-green-500 shrink-0" />
             Contact Support (WhatsApp)
-          </a>
+          </button>
         </div>
 
         <div className="border-t border-neutral-100 p-2">

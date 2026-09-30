@@ -71,7 +71,7 @@ export default function Calendar({
 
   // Properties visible to this role, before the single-property filter.
   // Only `active` properties are bookable, so in_review / rejected /
-  // in_inactive properties never appear on the calendar.
+  // inactive properties never appear on the calendar.
   const scopedProperties = useMemo(() => {
     const bookable = MOCK_PROPERTIES.filter((p) => p.status === "active");
     if (!ownedPropertyIds) return bookable;

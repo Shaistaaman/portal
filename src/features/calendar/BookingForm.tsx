@@ -47,7 +47,7 @@ export default function BookingForm({
   const availableTypes = BOOKING_TYPES_BY_ROLE[role];
 
   // Only `active` properties are bookable (in_review / rejected /
-  // in_inactive are never offered).
+  // inactive are never offered).
   const ownedPropertyIds = useMemo(
     () =>
       new Set(

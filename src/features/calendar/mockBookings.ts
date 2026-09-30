@@ -35,9 +35,45 @@ interface Seed {
   children: number;
   maintenanceNote?: string;
   createdByRole: Booking["createdByRole"];
+  /** Display name of the staff member or client who made the booking. */
+  createdByName: string;
 }
 
 const SEEDS: Seed[] = [
+  // Two freshly submitted bookings awaiting admin approval — every booking
+  // now enters at "requested" (BOOKING_CREATION_STATUS), so the dataset
+  // needs examples of it or the approval dropdown is never reachable.
+  {
+    id: "bk-15",
+    propertyId: "1",
+    bookingType: "guest",
+    status: "requested",
+    startOffset: 21,
+    nights: 6,
+    guestName: "L. Marchetti",
+    guestPhone: "+39 333 555 0182",
+    guestEmail: "l.marchetti@example.com",
+    adults: 2,
+    children: 2,
+    createdByRole: "agent",
+    createdByName: "Marco Bianchi",
+  },
+  {
+    id: "bk-16",
+    propertyId: "3",
+    bookingType: "maintenance",
+    status: "requested",
+    startOffset: 30,
+    nights: 2,
+    guestName: "Facilities Team",
+    guestPhone: "+39 06 5555 0100",
+    guestEmail: "facilities@skylifemanagement.com",
+    adults: 0,
+    children: 0,
+    maintenanceNote: "Terrace waterproofing survey and balustrade check.",
+    createdByRole: "owner",
+    createdByName: "Giulia Romano",
+  },
   {
     id: "bk-1",
     propertyId: "1",
@@ -51,12 +87,13 @@ const SEEDS: Seed[] = [
     adults: 2,
     children: 0,
     createdByRole: "admin",
+    createdByName: "Martina Vance",
   },
   {
     id: "bk-2",
     propertyId: "2",
     bookingType: "guest",
-    status: "payment_pending",
+    status: "confirmed",
     startOffset: 6,
     nights: 4,
     guestName: "C. Villiers",
@@ -65,6 +102,7 @@ const SEEDS: Seed[] = [
     adults: 3,
     children: 1,
     createdByRole: "agent",
+    createdByName: "Marco Bianchi",
   },
   {
     id: "bk-3",
@@ -80,6 +118,7 @@ const SEEDS: Seed[] = [
     children: 0,
     maintenanceNote: "Pool resurfacing and deep clean.",
     createdByRole: "admin",
+    createdByName: "Martina Vance",
   },
   {
     id: "bk-4",
@@ -94,6 +133,7 @@ const SEEDS: Seed[] = [
     adults: 2,
     children: 2,
     createdByRole: "admin",
+    createdByName: "Martina Vance",
   },
   {
     id: "bk-5",
@@ -108,6 +148,7 @@ const SEEDS: Seed[] = [
     adults: 2,
     children: 0,
     createdByRole: "admin",
+    createdByName: "Martina Vance",
   },
   {
     id: "bk-6",
@@ -122,12 +163,13 @@ const SEEDS: Seed[] = [
     adults: 1,
     children: 0,
     createdByRole: "owner",
+    createdByName: "Giulia Romano",
   },
   {
     id: "bk-7",
     propertyId: "10",
     bookingType: "guest",
-    status: "payment_pending",
+    status: "confirmed",
     startOffset: 3,
     nights: 7,
     guestName: "R. Nakamura",
@@ -136,6 +178,7 @@ const SEEDS: Seed[] = [
     adults: 4,
     children: 2,
     createdByRole: "agent",
+    createdByName: "Elena Moretti",
   },
   {
     id: "bk-8",
@@ -150,6 +193,7 @@ const SEEDS: Seed[] = [
     adults: 2,
     children: 0,
     createdByRole: "admin",
+    createdByName: "Martina Vance",
   },
   {
     id: "bk-9",
@@ -165,6 +209,7 @@ const SEEDS: Seed[] = [
     children: 0,
     maintenanceNote: "HVAC servicing.",
     createdByRole: "owner",
+    createdByName: "Elena Ricci",
   },
   {
     id: "bk-10",
@@ -179,6 +224,7 @@ const SEEDS: Seed[] = [
     adults: 2,
     children: 1,
     createdByRole: "agent",
+    createdByName: "Elena Moretti",
   },
   {
     id: "bk-11",
@@ -194,6 +240,7 @@ const SEEDS: Seed[] = [
     children: 0,
     maintenanceNote: "",
     createdByRole: "owner",
+    createdByName: "Giulia Romano",
   },
   {
     id: "bk-12",
@@ -208,6 +255,7 @@ const SEEDS: Seed[] = [
     adults: 2,
     children: 1,
     createdByRole: "agent",
+    createdByName: "Marco Bianchi",
   },
 ];
 
@@ -227,6 +275,7 @@ export const MOCK_BOOKINGS: Booking[] = SEEDS.map((seed) => ({
   maintenanceNote: seed.maintenanceNote ?? "",
   nightlyRate: nightlyRateFor(seed.propertyId),
   createdByRole: seed.createdByRole,
+  createdByName: seed.createdByName,
 }));
 
 export function findMockBookingById(id: string): Booking | undefined {

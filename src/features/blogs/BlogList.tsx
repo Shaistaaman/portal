@@ -15,12 +15,12 @@ const ITEMS_PER_PAGE = 5;
 
 const STATUS_STYLES: Record<BlogStatus, string> = {
   active: "bg-green-100 text-green-800",
-  in_active: "bg-blue-100 text-blue-800",
+  inactive: "bg-blue-100 text-blue-800",
 };
 
 const STATUS_LABELS: Record<BlogStatus, string> = {
   active: "Active",
-  in_active: "In Active",
+  inactive: "Inactive",
 };
 
 function StatusBadge({ status }: { status: BlogStatus }) {
@@ -35,7 +35,7 @@ function StatusBadge({ status }: { status: BlogStatus }) {
 
 /**
  * Admin-only blogs list + detail view, mirroring PackageList /
- * ExperienceList. Plain active/in_active status toggle, no approval
+ * ExperienceList. Plain active/inactive status toggle, no approval
  * workflow.
  */
 export default function BlogList() {
@@ -70,7 +70,7 @@ export default function BlogList() {
     setBlogs((current) =>
       current.map((b) =>
         b.id === selectedBlog.id
-          ? { ...b, status: b.status === "active" ? "in_active" : "active" }
+          ? { ...b, status: b.status === "active" ? "inactive" : "active" }
           : b,
       ),
     );
@@ -308,7 +308,7 @@ export default function BlogList() {
         <ConfirmModal
           title="Blog Status Change"
           message={`Change this blog's status to "${
-            selectedBlog.status === "active" ? "In Active" : "Active"
+            selectedBlog.status === "active" ? "Inactive" : "Active"
           }"?`}
           confirmLabel="Confirm"
           onCancel={() => setPendingStatusToggle(false)}
