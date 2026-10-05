@@ -3,20 +3,37 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { useRole } from "../../hooks/useRole";
+import { nextBookingNumberForMonth } from "@/features/calendar/types";
+import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 
 interface LocationState {
   property?: {
     id: string;
     title: string;
+    /** Payout account shown on the payment panel; falls back if unset. */
+    accountName?: string;
+    bankAccount?: string;
   };
   startDate?: Date | null;
   endDate?: Date | null;
+  /** Itemized reservation breakdown (property-only booking flow). */
+  nightlyRate?: number;
+  numberOfNights?: number;
+  totalNightly?: number;
+  cleaningFee?: number;
+  serviceFee?: number;
+  taxes?: number;
   totalPrice?: number;
+  /** Experience lines (experience checkout flow). */
   experiences?: Array<{
     id: string;
     title: string;
     price: number;
+    slot?: string;
+    guests?: number;
   }>;
+  /** True when checking out experiences with no property booking. */
+  experienceOnly?: boolean;
 }
 
 interface FormData {
@@ -39,7 +56,24 @@ export default function ContactInfoPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state as LocationState) || {};
-  const { property, startDate, endDate, totalPrice, experiences = [] } = state;
+  const {
+    property,
+    startDate,
+    endDate,
+    nightlyRate,
+    numberOfNights,
+    totalNightly,
+    cleaningFee,
+    serviceFee,
+    taxes,
+    totalPrice,
+    experiences = [],
+    experienceOnly = false,
+  } = state;
+
+  // Booking Number is generated on confirm and shown in the success modal.
+  // In production the server assigns this at creation (BK-YYYY-MM-NNN).
+  const [bookingNumber, setBookingNumber] = useState<string>("");
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -112,7 +146,7 @@ export default function ContactInfoPage() {
       newErrors.email = "Please enter a valid email address";
     }
 
-    if (!formData.checkInTime) {
+    if (!experienceOnly && !formData.checkInTime) {
       newErrors.checkInTime = "Check-in time is required";
     }
 
@@ -126,7 +160,12 @@ export default function ContactInfoPage() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
+    // Booking Number for the current month: BK-<thisYear>-<thisMonth>-<NNN>,
+    // where NNN is the next count after existing bookings in this month.
+    // TODO(AWS integration): POST the property booking to admin-fn; the
+    // server assigns this number by counting the current month's rows and
+    // returning the next value, then we use the server-returned number here.
+    setBookingNumber(nextBookingNumberForMonth(MOCK_BOOKINGS));
     setTimeout(() => {
       setIsSubmitting(false);
       setShowConfirmation(true);
@@ -143,7 +182,7 @@ export default function ContactInfoPage() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900">
-      <main className="mx-auto max-w-[1280px] px-4 py-8 sm:px-8 sm:py-12 lg:px-12">
+      <main className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -163,9 +202,9 @@ export default function ContactInfoPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           {/* Left Column - Form */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
               {/* CONTACT DETAILS SECTION */}
               <div className="space-y-6">
@@ -195,74 +234,83 @@ export default function ContactInfoPage() {
                   )}
                 </div>
 
-                {/* Contact Phone */}
-                <div>
-                  <label className="block text-xs font-semibold tracking-wide text-neutral-700 mb-2">
-                    CONTACT PHONE
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="Enter your phone number"
-                    className={`w-full px-4 py-3 border rounded-lg font-light text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:border-transparent transition-all ${
-                      errors.phone
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-neutral-300 focus:ring-neutral-900"
-                    }`}
-                  />
-                  {errors.phone && (
-                    <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
-                  )}
-                </div>
+                {/* Contact Phone + Email in one row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold tracking-wide text-neutral-700 mb-2">
+                      CONTACT PHONE
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Enter your phone number"
+                      className={`w-full px-4 py-3 border rounded-lg font-light text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:border-transparent transition-all ${
+                        errors.phone
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-neutral-300 focus:ring-neutral-900"
+                      }`}
+                    />
+                    {errors.phone && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.phone}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Contact Email */}
-                <div>
-                  <label className="block text-xs font-semibold tracking-wide text-neutral-700 mb-2">
-                    CONTACT EMAIL
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email address"
-                    className={`w-full px-4 py-3 border rounded-lg font-light text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:border-transparent transition-all ${
-                      errors.email
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-neutral-300 focus:ring-neutral-900"
-                    }`}
-                  />
-                  {errors.email && (
-                    <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-                  )}
+                  <div>
+                    <label className="block text-xs font-semibold tracking-wide text-neutral-700 mb-2">
+                      CONTACT EMAIL
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter your email address"
+                      className={`w-full px-4 py-3 border rounded-lg font-light text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:border-transparent transition-all ${
+                        errors.email
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-neutral-300 focus:ring-neutral-900"
+                      }`}
+                    />
+                    {errors.email && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* CHECK-IN TIME SECTION */}
+              {/* CHECK-IN TIME SECTION — property stays only, not experiences */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-neutral-900">
-                  Check In Time
-                </h2>
-                <div>
-                  <input
-                    type="time"
-                    name="checkInTime"
-                    value={formData.checkInTime}
-                    onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg font-light text-neutral-900 focus:outline-none focus:ring-1 focus:border-transparent transition-all ${
-                      errors.checkInTime
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-neutral-300 focus:ring-neutral-900"
-                    }`}
-                  />
-                  {errors.checkInTime && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.checkInTime}
-                    </p>
-                  )}
-                </div>
+                {!experienceOnly && (
+                  <>
+                    <h2 className="text-lg font-semibold text-neutral-900">
+                      Check In Time
+                    </h2>
+                    <div>
+                      <input
+                        type="time"
+                        name="checkInTime"
+                        value={formData.checkInTime}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border rounded-lg font-light text-neutral-900 focus:outline-none focus:ring-1 focus:border-transparent transition-all ${
+                          errors.checkInTime
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-neutral-300 focus:ring-neutral-900"
+                        }`}
+                      />
+                      {errors.checkInTime && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.checkInTime}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
 
                 {/* Other Requests */}
                 <div>
@@ -308,8 +356,15 @@ export default function ContactInfoPage() {
                         </p>
 
                         <div className="bg-neutral-100 p-3 rounded text-xs font-mono text-neutral-800 mb-4 space-y-1">
-                          <div>ACCOUNT NAME: SKYLIFE ITALY</div>
-                          <div>IBAN: IT34H0300889898000050708893</div>
+                          <div>
+                            ACCOUNT NAME:{" "}
+                            {property?.accountName || "SKYLIFE ITALY"}
+                          </div>
+                          <div>
+                            IBAN:{" "}
+                            {property?.bankAccount ||
+                              "IT34H0300889898000050708893"}
+                          </div>
                         </div>
 
                         <p className="text-xs text-neutral-600 mb-3 leading-relaxed">
@@ -369,7 +424,7 @@ export default function ContactInfoPage() {
           </div>
 
           {/* Right Column - Floating Summary */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <div
               style={{
                 transform: `translateY(${scrollY}px)`,
@@ -407,20 +462,69 @@ export default function ContactInfoPage() {
                 </div>
               )}
 
+              {/* Itemized fee breakdown */}
+              {totalNightly != null && (
+                <div className="mb-6 pb-6 border-b border-neutral-200 space-y-3 text-sm text-neutral-600">
+                  <div className="flex items-center justify-between">
+                    <span>
+                      €{nightlyRate} x {numberOfNights}{" "}
+                      {numberOfNights === 1 ? "night" : "nights"}
+                    </span>
+                    <span className="font-medium text-neutral-900">
+                      €{totalNightly}
+                    </span>
+                  </div>
+                  {cleaningFee != null && (
+                    <div className="flex items-center justify-between">
+                      <span>Cleaning Fee</span>
+                      <span className="font-medium text-neutral-900">
+                        €{cleaningFee}
+                      </span>
+                    </div>
+                  )}
+                  {serviceFee != null && (
+                    <div className="flex items-center justify-between">
+                      <span>Service Fee</span>
+                      <span className="font-medium text-neutral-900">
+                        €{serviceFee}
+                      </span>
+                    </div>
+                  )}
+                  {taxes != null && (
+                    <div className="flex items-center justify-between">
+                      <span>Taxes</span>
+                      <span className="font-medium text-neutral-900">
+                        €{taxes}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Experiences */}
               {experiences.length > 0 && (
                 <div className="mb-6 pb-6 border-b border-neutral-200">
                   <p className="text-xs font-light text-neutral-500 mb-3">
-                    ADDED EXPERIENCES ({experiences.length})
+                    {experienceOnly ? "EXPERIENCES" : "ADDED EXPERIENCES"} (
+                    {experiences.length})
                   </p>
                   <div className="space-y-2">
                     {experiences.map((exp) => (
                       <div
                         key={exp.id}
-                        className="flex justify-between items-start"
+                        className="flex justify-between items-start gap-2"
                       >
                         <span className="text-xs text-neutral-600 flex-1">
                           {exp.title}
+                          {(exp.slot || exp.guests) && (
+                            <span className="block text-[11px] text-neutral-400">
+                              {exp.slot}
+                              {exp.slot && exp.guests ? " · " : ""}
+                              {exp.guests
+                                ? `${exp.guests} guest${exp.guests === 1 ? "" : "s"}`
+                                : ""}
+                            </span>
+                          )}
                         </span>
                         <span className="text-xs font-medium text-neutral-900">
                           €{exp.price}
@@ -432,8 +536,8 @@ export default function ContactInfoPage() {
               )}
 
               {/* Total Price */}
-              {totalPrice && (
-                <div className="border-t border-neutral-200 pt-6">
+              {totalPrice != null && (
+                <div className="pt-2">
                   <div className="flex items-baseline justify-between">
                     <span className="text-lg font-bold text-neutral-900">
                       Total
@@ -453,7 +557,11 @@ export default function ContactInfoPage() {
       </main>
 
       {/* Confirmation Modal */}
-      <ConfirmationModal isOpen={showConfirmation} onClose={handleCloseModal} />
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={handleCloseModal}
+        bookingNumber={bookingNumber}
+      />
     </div>
   );
 }

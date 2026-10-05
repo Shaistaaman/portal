@@ -12,7 +12,7 @@ import {
   Star,
 } from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { MOCK_PROPERTIES } from "./mockProperties";
+import { PROPERTIES } from "./properties";
 import type { Property, PropertyStatus } from "./types";
 
 export type PropertyListRole = "admin" | "owner" | "agent";
@@ -77,7 +77,7 @@ function FeaturedBadge() {
  */
 export default function PropertyList({ role }: { role: PropertyListRole }) {
   const navigate = useNavigate();
-  const [properties, setProperties] = useState<Property[]>(MOCK_PROPERTIES);
+  const [properties, setProperties] = useState<Property[]>(PROPERTIES);
 
   const [searchQuery, setSearchQuery] = useState("");
 

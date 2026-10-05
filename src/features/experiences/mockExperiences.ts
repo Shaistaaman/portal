@@ -147,6 +147,57 @@ export const MOCK_EXPERIENCES: Experience[] = [
       "Create art inspired by the colour and light of Positano, guided by a local painter on a private terrace above the sea.",
     specialRequirements: "",
   },
+  // Wishlist demo experiences — ids match the wishlist entries so a
+  // wishlisted card lands on this experience's detail page.
+  {
+    id: "exp-1",
+    name: "Vatican VIP Tour",
+    location: "Vatican City",
+    status: "active",
+    images: [
+      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800",
+      "https://images.unsplash.com/photo-1520763185298-1b434c919abe?q=80&w=800",
+      "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=800",
+      "https://images.unsplash.com/photo-1469022563149-aa64dbd37dae?q=80&w=800",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800",
+      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=800",
+    ],
+    duration: "3 Hours",
+    durationMinutes: 180,
+    bookableFrom: "09:00",
+    bookableUntil: "17:00",
+    pricePerPerson: 750,
+    maxGuests: 8,
+    categories: ["History & Culture", "Closed-to-the-Public"],
+    season: "Year-round",
+    description:
+      "Skip the queues for a privately guided tour of the Vatican Museums, Sistine Chapel, and St. Peter's Basilica with an expert art historian.",
+    specialRequirements: "Dress code enforced: shoulders and knees covered.",
+  },
+  {
+    id: "exp-2",
+    name: "Roman Golf Cart Tour",
+    location: "Rome",
+    status: "active",
+    images: [
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800",
+      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800",
+      "https://images.unsplash.com/photo-1469022563149-aa64dbd37dae?q=80&w=800",
+      "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=800",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800",
+    ],
+    duration: "2 Hours",
+    durationMinutes: 120,
+    bookableFrom: "10:00",
+    bookableUntil: "18:00",
+    pricePerPerson: 123,
+    maxGuests: 4,
+    categories: ["History & Culture", "One-Day City Escapes"],
+    season: "Year-round",
+    description:
+      "Glide through Rome's historic center by private golf cart, covering more ground than a walking tour while your guide shares the city's stories.",
+    specialRequirements: "",
+  },
 ];
 
 export function findMockExperienceById(id: string): Experience | undefined {

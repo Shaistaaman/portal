@@ -79,6 +79,8 @@ export interface Property {
   cleaningFee?: number;
   /** Tax rate as a percentage, e.g. 10 means 10% — not a fraction. */
   taxPct?: number;
+  /** Name on the bank account that receives this property's payouts. */
+  accountName?: string;
   /** IBAN the property's payouts are sent to. */
   bankAccount?: string;
 
@@ -137,6 +139,7 @@ export type PropertyFormValues = Pick<
       | "serviceFee"
       | "cleaningFee"
       | "taxPct"
+      | "accountName"
       | "bankAccount"
     >
   >;
@@ -207,6 +210,7 @@ export const EMPTY_PROPERTY_FORM_VALUES: PropertyFormValues = {
   serviceFee: 0,
   cleaningFee: 0,
   taxPct: 0,
+  accountName: "",
   bankAccount: "",
 };
 

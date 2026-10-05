@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddPropertyWizard from "@/features/properties/AddPropertyWizard";
-import { findMockPropertyById } from "@/features/properties/mockProperties";
+import { findPropertyById } from "@/features/properties/properties";
 
 export default function OwnerEditPropertyPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const property = id ? findMockPropertyById(id) : undefined;
+  const property = id ? findPropertyById(id) : undefined;
 
   if (!property) {
     return (

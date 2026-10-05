@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, Calendar } from "lucide-react";
-import { MOCK_PROPERTIES } from "@/features/properties/mockProperties";
+import { PROPERTIES } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 import { bookingNumbers, type Booking } from "@/features/calendar/types";
 import ConfirmModal from "@/components/ui/ConfirmModal";
@@ -38,7 +38,7 @@ export default function OwnerDashboardPage() {
 
   // Owner's property metrics
   const ownedProperties = useMemo(
-    () => MOCK_PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID),
+    () => PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID),
     [],
   );
 

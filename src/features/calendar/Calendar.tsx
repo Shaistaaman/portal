@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { MOCK_PROPERTIES } from "@/features/properties/mockProperties";
+import { PROPERTIES } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "./mockBookings";
 import {
   BOOKING_STATUS_COLORS,
@@ -61,9 +61,7 @@ export default function Calendar({
   const ownedPropertyIds = useMemo(() => {
     if (role === "owner") {
       return new Set(
-        MOCK_PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID).map(
-          (p) => p.id,
-        ),
+        PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID).map((p) => p.id),
       );
     }
     return null; // admin/agent: all properties
@@ -73,7 +71,7 @@ export default function Calendar({
   // Only `active` properties are bookable, so in_review / rejected /
   // inactive properties never appear on the calendar.
   const scopedProperties = useMemo(() => {
-    const bookable = MOCK_PROPERTIES.filter((p) => p.status === "active");
+    const bookable = PROPERTIES.filter((p) => p.status === "active");
     if (!ownedPropertyIds) return bookable;
     return bookable.filter((p) => ownedPropertyIds.has(p.id));
   }, [ownedPropertyIds]);
@@ -344,7 +342,7 @@ function TimelineView({
   bookings,
 }: {
   role: CalendarRole;
-  properties: typeof MOCK_PROPERTIES;
+  properties: typeof PROPERTIES;
   bookings: Booking[];
 }) {
   const navigate = useNavigate();

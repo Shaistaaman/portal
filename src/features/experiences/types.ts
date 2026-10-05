@@ -134,3 +134,63 @@ export function timeToMinutes(hhmm: string): number | null {
   if (hours > 23 || mins > 59) return null;
   return hours * 60 + mins;
 }
+
+/** Format minutes-since-midnight back to "HH:MM". */
+export function minutesToTime(total: number): string {
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+/** Human duration from minutes: 180 → "3h", 150 → "2h 30m", 45 → "45m". */
+export function formatDurationMinutes(total: number): string {
+  if (total <= 0) return "";
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+export interface ExperienceSlot {
+  /** "HH:MM" start. */
+  start: string;
+  /** "HH:MM" end (start + durationMinutes). */
+  end: string;
+  /** Display label, e.g. "10:00 – 13:00". */
+  label: string;
+}
+
+/**
+ * The bookable time slots for an experience: every start time from
+ * `bookableFrom` up to the latest start that still lets the experience end
+ * by `bookableUntil`, stepped by `step` minutes (default 30). Each slot is
+ * exactly `durationMinutes` long.
+ *
+ * Example: window 09:00–17:00, duration 180 → 09:00–12:00, 09:30–12:30, …,
+ * 14:00–17:00. Returns [] if the window/duration are missing or the window
+ * is too short to hold one slot.
+ */
+export function experienceSlots(
+  experience: Pick<
+    Experience,
+    "bookableFrom" | "bookableUntil" | "durationMinutes"
+  >,
+  step = 30,
+): ExperienceSlot[] {
+  const from = timeToMinutes(experience.bookableFrom);
+  const until = timeToMinutes(experience.bookableUntil);
+  const dur = experience.durationMinutes;
+  if (from === null || until === null || dur <= 0) return [];
+
+  const slots: ExperienceSlot[] = [];
+  for (let start = from; start + dur <= until; start += step) {
+    const end = start + dur;
+    slots.push({
+      start: minutesToTime(start),
+      end: minutesToTime(end),
+      label: `${minutesToTime(start)} – ${minutesToTime(end)}`,
+    });
+  }
+  return slots;
+}

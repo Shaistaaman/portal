@@ -44,6 +44,12 @@ export default function AccountSettings({ role }: { role: UserRole }) {
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
+  // Admin-only org bank details (default payout account).
+  const [bank, setBank] = useState({
+    accountName: "",
+    iban: "",
+  });
+
   const [savedSection, setSavedSection] = useState<string | null>(null);
 
   const flashSaved = (section: string) => {
@@ -60,6 +66,11 @@ export default function AccountSettings({ role }: { role: UserRole }) {
   const handleAgencySubmit = (e: FormEvent) => {
     e.preventDefault();
     flashSaved("agency");
+  };
+
+  const handleBankSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    flashSaved("bank");
   };
 
   const handlePasswordSubmit = (e: FormEvent) => {
@@ -261,6 +272,43 @@ export default function AccountSettings({ role }: { role: UserRole }) {
           <SaveButton>Update Password</SaveButton>
         </form>
       </Section>
+
+      {/* Admin-only: default org bank details */}
+      {role === "admin" && (
+        <Section
+          title="Bank Details"
+          description="Default payout account for the organization."
+          saved={savedSection === "bank"}
+        >
+          <form onSubmit={handleBankSubmit} className="space-y-4">
+            <Field label="Account Name">
+              <input
+                type="text"
+                value={bank.accountName}
+                onChange={(e) =>
+                  setBank({ ...bank, accountName: e.target.value })
+                }
+                placeholder="e.g. Skylife Italy"
+                className={inputClass}
+              />
+            </Field>
+            <Field label="IBAN">
+              <input
+                type="text"
+                value={bank.iban}
+                onChange={(e) =>
+                  setBank({ ...bank, iban: e.target.value.toUpperCase() })
+                }
+                placeholder="IT60 X054 2811 1010 0000 0123 456"
+                autoComplete="off"
+                spellCheck={false}
+                className={`${inputClass} font-mono tracking-wide`}
+              />
+            </Field>
+            <SaveButton>Save Bank Details</SaveButton>
+          </form>
+        </Section>
+      )}
     </div>
   );
 }

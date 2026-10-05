@@ -4,11 +4,14 @@ import { Check } from "lucide-react";
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Booking Number to display, e.g. "BK-2026-04-017". */
+  bookingNumber?: string;
 }
 
 export default function ConfirmationModal({
   isOpen,
   onClose,
+  bookingNumber,
 }: ConfirmationModalProps) {
   return (
     <AnimatePresence>
@@ -44,10 +47,21 @@ export default function ConfirmationModal({
                 <h2 className="font-serif text-2xl font-normal text-neutral-900 italic mb-4">
                   Thank You for the Reservation Request.
                 </h2>
-                <p className="text-sm font-light text-neutral-600 leading-relaxed mb-8">
+                <p className="text-sm font-light text-neutral-600 leading-relaxed mb-6">
                   You'll be contacted by a Skylife concierge within 24 hours to
                   confirm your stay.
                 </p>
+
+                {bookingNumber && (
+                  <div className="mb-8 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3">
+                    <p className="text-[11px] font-light uppercase tracking-wide text-neutral-500">
+                      Booking Number
+                    </p>
+                    <p className="font-mono text-base font-semibold text-neutral-900">
+                      {bookingNumber}
+                    </p>
+                  </div>
+                )}
 
                 {/* Close Button */}
                 <button

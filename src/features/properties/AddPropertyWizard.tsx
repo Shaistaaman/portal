@@ -715,6 +715,20 @@ export default function AddPropertyWizard({
               </p>
             </Field>
 
+            <Field label="Account Name">
+              <input
+                type="text"
+                value={values.accountName}
+                onChange={(e) => update("accountName", e.target.value)}
+                placeholder="e.g. Skylife Italy"
+                autoComplete="off"
+                className={inputClass}
+              />
+              <p className="text-xs text-neutral-500 mt-1.5">
+                Name on the account, shown to guests on the payment page.
+              </p>
+            </Field>
+
             <Field label="Bank Account (IBAN)">
               <input
                 type="text"

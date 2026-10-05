@@ -1,8 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import {
-  MOCK_PROPERTIES,
-  nightlyRateFor,
-} from "@/features/properties/mockProperties";
+import { PROPERTIES, nightlyRateFor } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "./mockBookings";
 import {
   BOOKING_TYPE_LABELS,
@@ -51,15 +48,13 @@ export default function BookingForm({
   const ownedPropertyIds = useMemo(
     () =>
       new Set(
-        MOCK_PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID).map(
-          (p) => p.id,
-        ),
+        PROPERTIES.filter((p) => p.ownerId === DEMO_OWNER_ID).map((p) => p.id),
       ),
     [],
   );
 
   const properties = useMemo(() => {
-    const bookable = MOCK_PROPERTIES.filter((p) => p.status === "active");
+    const bookable = PROPERTIES.filter((p) => p.status === "active");
     if (role === "owner") {
       // For owner: show all properties, but will filter later based on booking type
       return bookable;

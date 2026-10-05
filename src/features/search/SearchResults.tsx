@@ -9,10 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import {
-  MOCK_PROPERTIES,
-  nightlyRateFor,
-} from "@/features/properties/mockProperties";
+import { PROPERTIES, nightlyRateFor } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 import type { Property } from "@/features/properties/types";
 import type { Guests } from "@/components/search/PropertySearch";
@@ -113,7 +110,7 @@ export default function SearchResults({
   );
 
   const availableProperties = useMemo(() => {
-    return MOCK_PROPERTIES.filter((property) => {
+    return PROPERTIES.filter((property) => {
       // Status filter
       if (property.status !== "active") return false;
 
@@ -288,23 +285,28 @@ export default function SearchResults({
                       key={property.id}
                       className="bg-white border border-neutral-300 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
                     >
-                      <div className="flex flex-col sm:flex-row gap-6 p-6">
+                      {/* Fixed card height on sm+ so every row matches
+                          regardless of content; the image is a fixed-size
+                          cell that never stretches the card. Height is tall
+                          enough to fit all content rows + the action buttons
+                          without clipping. */}
+                      <div className="flex flex-col sm:flex-row gap-6 p-6 sm:h-72">
                         {/* Image */}
-                        <div className="flex-shrink-0 w-full sm:w-48">
+                        <div className="flex-shrink-0 w-full sm:w-64 sm:h-full">
                           <div className="relative h-48 sm:h-full bg-neutral-200 rounded-xl overflow-hidden">
                             <img
                               src={property.images[0]}
                               alt={property.name}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                              className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             />
                           </div>
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 flex flex-col justify-between">
+                        <div className="flex-1 min-w-0 flex flex-col justify-between overflow-hidden">
                           {/* Title and Like */}
                           <div className="flex items-start justify-between gap-4 mb-4">
-                            <h2 className="text-2xl font-semibold text-neutral-950">
+                            <h2 className="text-2xl font-semibold text-neutral-950 line-clamp-1">
                               {property.name}
                             </h2>
                             {!isAgent && (

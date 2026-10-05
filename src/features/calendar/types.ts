@@ -223,6 +223,39 @@ export function bookingNumbers(
   return result;
 }
 
+/**
+ * Next Booking Number for a newly created booking, in the CURRENT month:
+ * `BK-<thisYear>-<thisMonth>-<NNN>`, where NNN is one past however many
+ * bookings already fall in this month. Deterministic, not random.
+ *
+ * "Falls in this month" is measured by each existing booking's check-in
+ * month (the same basis `bookingNumbers` uses), so the sequence is
+ * consistent with the numbers shown elsewhere.
+ *
+ * TODO(AWS integration): the server assigns this at creation — it should
+ * count the rows already created in the current year-month and return the
+ * next value, so two concurrent requests can't collide (a DB sequence or a
+ * `SELECT count(*) ... FOR UPDATE` per month). This client-side version is
+ * for the mock flow only.
+ */
+export function nextBookingNumberForMonth(
+  existing: { checkIn: string }[],
+  now: Date = new Date(),
+): string {
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const countThisMonth = existing.filter((b) => {
+    const d = new Date(b.checkIn);
+    return (
+      !Number.isNaN(d.getTime()) &&
+      d.getFullYear() === year &&
+      d.getMonth() + 1 === month
+    );
+  }).length;
+  const next = countThisMonth + 1;
+  return `BK-${year}-${String(month).padStart(2, "0")}-${String(next).padStart(3, "0")}`;
+}
+
 /** Whole-day count between check-in (inclusive) and check-out (exclusive). */
 export function nightsBetween(checkIn: string, checkOut: string): number {
   const start = new Date(checkIn);

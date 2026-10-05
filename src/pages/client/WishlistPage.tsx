@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRole } from "@/hooks/useRole";
+import { PROPERTIES } from "@/features/properties/properties";
+import { MOCK_EXPERIENCES } from "@/features/experiences/mockExperiences";
 
 interface WishlistItem {
   id: string;
@@ -11,49 +14,34 @@ interface WishlistItem {
   price: number;
 }
 
+// Build wishlist from MOCK_PROPERTIES and MOCK_EXPERIENCES
+// The wishlist contains specific property and experience IDs
+const WISHLIST_IDS = ["prop-1", "prop-2", "exp-1", "exp-2"];
+
 const MOCK_WISHLIST: WishlistItem[] = [
-  // Properties
-  {
-    id: "prop-1",
-    title: "Tiber Luxury Penthouse",
-    type: "property",
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=400",
-    location: "Rome",
-    price: 750,
-  },
-  {
-    id: "prop-2",
-    title: "360 Penthouse",
-    type: "property",
-    image:
-      "https://images.unsplash.com/photo-1499209974033-537250602fbf?q=80&w=400",
-    location: "Florence",
-    price: 123,
-  },
-  // Experiences
-  {
-    id: "exp-1",
-    title: "Vatican VIP Tour",
-    type: "experience",
-    image:
-      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=400",
-    location: "Vatican City",
-    price: 750,
-  },
-  {
-    id: "exp-2",
-    title: "Roman Golf Cart Tour",
-    type: "experience",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=400",
-    location: "Rome",
-    price: 123,
-  },
+  ...PROPERTIES.filter((p) => WISHLIST_IDS.includes(p.id)).map((p) => ({
+    id: p.id,
+    title: p.name,
+    type: "property" as const,
+    image: p.images[0] || "",
+    location: p.location,
+    price: 0, // Properties don't have a direct price; nightly rate is dynamic
+  })),
+  ...MOCK_EXPERIENCES.filter((e) => WISHLIST_IDS.includes(e.id)).map((e) => ({
+    id: e.id,
+    title: e.name,
+    type: "experience" as const,
+    image: e.images[0] || "",
+    location: e.location,
+    price: e.pricePerPerson,
+  })),
 ];
 
 export default function ClientWishlistPage() {
   const navigate = useNavigate();
+  // Shared by client and agent — route back into whichever portal is active.
+  const role = useRole();
+  const basePath = role === "agent" ? "/agent" : "/client";
   const [wishlisted, setWishlisted] = useState<Set<string>>(
     new Set(MOCK_WISHLIST.map((item) => item.id)),
   );
@@ -74,27 +62,13 @@ export default function ClientWishlistPage() {
   };
 
   const handleCardClick = (item: WishlistItem) => {
-    // For experiences: navigate to request-experience with wishlist flow flag
     if (item.type === "experience") {
-      navigate(`/client/property/${item.id}/request-experience`, {
-        state: {
-          selectedExperiences: [
-            {
-              id: item.id,
-              title: item.title,
-              price: item.price,
-              rating: 4.9,
-              image: item.image,
-              category: "Experience",
-              location: item.location,
-            },
-          ],
-          isWishlistFlow: true, // Flag to hide back button, property section, and redirect on completion
-        },
-      });
+      // Open the experience detail page; its Request button (slot picker)
+      // then leads into the request-experience grid.
+      navigate(`${basePath}/experience/${item.id}`);
     } else {
       // For properties: navigate normally to property detail
-      navigate(`/client/property/${item.id}`);
+      navigate(`${basePath}/property/${item.id}`);
     }
   };
 

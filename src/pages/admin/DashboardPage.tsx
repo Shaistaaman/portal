@@ -7,7 +7,7 @@ import {
   ChevronRight,
   Search,
 } from "lucide-react";
-import { MOCK_PROPERTIES } from "@/features/properties/mockProperties";
+import { PROPERTIES } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 import {
   BOOKING_STATUS_LABELS,
@@ -77,16 +77,10 @@ export default function DashboardPage() {
 
   // Portfolio Health metrics
   const portfolioMetrics = useMemo(() => {
-    const active = MOCK_PROPERTIES.filter((p) => p.status === "active").length;
-    const inReview = MOCK_PROPERTIES.filter(
-      (p) => p.status === "in_review",
-    ).length;
-    const inactive = MOCK_PROPERTIES.filter(
-      (p) => p.status === "inactive",
-    ).length;
-    const rejected = MOCK_PROPERTIES.filter(
-      (p) => p.status === "rejected",
-    ).length;
+    const active = PROPERTIES.filter((p) => p.status === "active").length;
+    const inReview = PROPERTIES.filter((p) => p.status === "in_review").length;
+    const inactive = PROPERTIES.filter((p) => p.status === "inactive").length;
+    const rejected = PROPERTIES.filter((p) => p.status === "rejected").length;
     return { active, inReview, inactive, rejected };
   }, []);
 

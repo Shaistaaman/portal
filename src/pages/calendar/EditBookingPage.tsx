@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import BookingForm from "@/features/calendar/BookingForm";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { findMockBookingById } from "@/features/calendar/mockBookings";
-import { MOCK_PROPERTIES } from "@/features/properties/mockProperties";
+import { PROPERTIES } from "@/features/properties/properties";
 import {
   BOOKING_STATUS_COLORS,
   BOOKING_STATUS_LABELS,
@@ -53,7 +53,7 @@ export default function EditBookingPage({ role }: { role: UserRole }) {
   }
 
   const ownsProperty =
-    MOCK_PROPERTIES.find((p) => p.id === booking.propertyId)?.ownerId ===
+    PROPERTIES.find((p) => p.id === booking.propertyId)?.ownerId ===
     DEMO_OWNER_ID;
   const editable = canEditBooking(booking, role, ownsProperty);
   const transitions = allowedTransitions(booking, role);

@@ -1,7 +1,4 @@
-import {
-  MOCK_PROPERTIES,
-  nightlyRateFor,
-} from "@/features/properties/mockProperties";
+import { PROPERTIES, nightlyRateFor } from "@/features/properties/properties";
 import type { Booking } from "./types";
 
 /**
@@ -18,7 +15,7 @@ function isoDate(daysFromToday: number): string {
 }
 
 function propertyName(id: string): string {
-  return MOCK_PROPERTIES.find((p) => p.id === id)?.name ?? "Property";
+  return PROPERTIES.find((p) => p.id === id)?.name ?? "Property";
 }
 
 interface Seed {

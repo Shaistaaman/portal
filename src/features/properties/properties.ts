@@ -1,13 +1,19 @@
 import type { Property } from "./types";
 
 /**
- * Mock property catalogue. Replace with a real API call once admin-fn
- * exists (see Context_Instruction.md §3/§8). ownerId values line up with
- * MOCK_USERS in features/user-management/mockUsers.ts (Giulia Romano is
- * "2", Elena Ricci is "6", Alessandro Barbieri is "9") so an owner session
- * scoped by ownerId has more than one property to look at.
+ * Unified mock property catalogue. Single source of truth for all properties
+ * across the entire application. All UI surfaces (admin, agent, client) use
+ * this data. Replace with a real API call once admin-fn exists
+ * (see Context_Instruction.md §3/§8).
+ *
+ * ownerId values line up with MOCK_USERS in features/user-management/mockUsers.ts
+ * (Giulia Romano is "2", Elena Ricci is "6", Alessandro Barbieri is "9").
+ *
+ * Each property includes all fields that any UI might need. Financial terms
+ * (serviceFee, cleaningFee, taxPct, accountName, bankAccount) are per-property
+ * and override org defaults when set.
  */
-export const MOCK_PROPERTIES: Property[] = [
+export const PROPERTIES: Property[] = [
   {
     id: "1",
     name: "Villa Toscana",
@@ -22,6 +28,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 480,
     floorNumber: "",
     listingUrl: "",
+    address: "Via della Toscana 123, 53026 Pienza, SI, Italy",
+    latitude: "43.0987",
+    longitude: "11.8899",
     images: [
       "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -33,6 +42,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: ["https://calendar.example.com/villa-toscana.ics"],
+    serviceFee: 100,
+    cleaningFee: 200,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "2",
@@ -48,6 +62,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 180,
     floorNumber: "4",
     listingUrl: "",
+    address: "Via del Pantheon 42, 00186 Rome, Italy",
+    latitude: "41.8986",
+    longitude: "12.4768",
     images: [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -59,6 +76,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 75,
+    cleaningFee: 150,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "3",
@@ -74,6 +96,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 620,
     floorNumber: "",
     listingUrl: "",
+    address: "Via Costiera Amalfitana 234, 84011 Amalfi, SA, Italy",
+    latitude: "40.6332",
+    longitude: "14.6025",
     images: [
       "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -85,6 +110,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 125,
+    cleaningFee: 250,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "4",
@@ -100,19 +130,27 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 260,
     floorNumber: "",
     listingUrl: "",
+    address: "Via Lakeside 88, 22100 Como, CO, Italy",
+    latitude: "45.8081",
+    longitude: "9.0873",
     images: [
       "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200&auto=format&fit=crop",
     ],
     amenities: ["Private Dock / Marina", "Panoramic Sea View"],
     benefits: [],
+    rejectionReason:
+      "Listing photos do not show the jetty/private dock referenced in the description. Please add supporting images and resubmit.",
     ownerId: "6",
     ownerName: "Elena Ricci",
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
-    rejectionReason:
-      "Listing photos do not show the jetty/private dock referenced in the description. Please add supporting images and resubmit.",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 100,
+    cleaningFee: 180,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "5",
@@ -128,6 +166,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 210,
     floorNumber: "",
     listingUrl: "",
+    address: "Rio Terà Canal Grande 156, 30123 Venice, Italy",
+    latitude: "45.4368",
+    longitude: "12.3345",
     images: [
       "https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -139,6 +180,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: [],
+    serviceFee: 85,
+    cleaningFee: 160,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "6",
@@ -154,6 +200,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 720,
     floorNumber: "",
     listingUrl: "",
+    address: "Via Masseria 456, 91025 Marsala, TP, Italy",
+    latitude: "37.7961",
+    longitude: "12.4278",
     images: [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -165,6 +214,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 150,
+    cleaningFee: 280,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "7",
@@ -180,6 +234,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 240,
     floorNumber: "9",
     listingUrl: "",
+    address: "Via Montenapoleone 75, 20121 Milan, Italy",
+    latitude: "45.4711",
+    longitude: "9.1971",
     images: [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -191,6 +248,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: [],
+    serviceFee: 90,
+    cleaningFee: 170,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "8",
@@ -206,6 +268,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 390,
     floorNumber: "",
     listingUrl: "",
+    address: "Strada Chiantigiana 789, 53013 Gaiole in Chianti, SI, Italy",
+    latitude: "43.4589",
+    longitude: "11.6245",
     images: [
       "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -217,6 +282,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 120,
+    cleaningFee: 220,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "9",
@@ -232,6 +302,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 140,
     floorNumber: "3",
     listingUrl: "",
+    address: "Lungarno Acciaioli 123, 50123 Florence, Italy",
+    latitude: "43.7707",
+    longitude: "11.2549",
     images: [
       "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -243,6 +316,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 70,
+    cleaningFee: 140,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "10",
@@ -258,6 +336,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 420,
     floorNumber: "",
     listingUrl: "",
+    address: "Via Cristoforo Colombo 234, 84017 Positano, SA, Italy",
+    latitude: "40.6261",
+    longitude: "14.4878",
     images: [
       "https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -273,6 +354,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 130,
+    cleaningFee: 240,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "11",
@@ -288,6 +374,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 175,
     floorNumber: "2",
     listingUrl: "",
+    address: "Via Roma 567, 10100 Turin, Italy",
+    latitude: "45.0705",
+    longitude: "7.6868",
     images: [
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -299,6 +388,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 80,
+    cleaningFee: 150,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "12",
@@ -314,6 +408,9 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 360,
     floorNumber: "",
     listingUrl: "",
+    address: "Via Krupp 890, 80073 Capri, NA, Italy",
+    latitude: "40.5533",
+    longitude: "14.2291",
     images: [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200&auto=format&fit=crop",
     ],
@@ -329,6 +426,11 @@ export const MOCK_PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 140,
+    cleaningFee: 260,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
   },
   {
     id: "13",
@@ -344,32 +446,113 @@ export const MOCK_PROPERTIES: Property[] = [
     areaSqm: 310,
     floorNumber: "",
     listingUrl: "",
+    address: "Via Umberto I 234, 16034 Portofino, GE, Italy",
+    latitude: "44.3039",
+    longitude: "9.2084",
     images: [
       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
     ],
     amenities: ["Private Beach Access", "Panoramic Sea View"],
     benefits: ["Luxury positioning"],
+    rejectionReason:
+      "Property documentation incomplete. Please provide insurance certificates and utility bills for the past 6 months. After submission, we will prioritize review.",
     ownerId: "2",
     ownerName: "Giulia Romano",
     ownerAvatarUrl:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
-    rejectionReason:
-      "Property documentation incomplete. Please provide insurance certificates and utility bills for the past 6 months. After submission, we will prioritize review.",
     isFeatured: false,
     icalUrls: [],
+    serviceFee: 110,
+    cleaningFee: 200,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
+  },
+  // Wishlist demo properties — ids match the wishlist entries
+  {
+    id: "prop-1",
+    name: "Tiber Luxury Penthouse",
+    location: "Rome, Italy",
+    description:
+      "An elegant penthouse overlooking the Tiber River with panoramic city views, rooftop terrace, and luxury amenities.",
+    status: "active",
+    propertyType: "penthouse",
+    managementLevel: "full-service",
+    bedrooms: 3,
+    bathrooms: 3,
+    areaSqm: 220,
+    floorNumber: "8",
+    listingUrl: "",
+    address: "Lungotevere Castello 78, 00193 Rome, Italy",
+    latitude: "41.9020",
+    longitude: "12.4695",
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: ["Rooftop Terrace", "Panoramic River View", "Smart Home System"],
+    benefits: ["Luxury positioning", "Premium guest matching"],
+    ownerId: "2",
+    ownerName: "Giulia Romano",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
+    isFeatured: true,
+    icalUrls: [],
+    serviceFee: 95,
+    cleaningFee: 180,
+    taxPct: 10,
+    accountName: "Skylife Italy",
+    bankAccount: "IT34H0300889898000050708893",
+  },
+  {
+    id: "prop-2",
+    name: "360 Penthouse",
+    location: "Florence, Italy",
+    description:
+      "A contemporary penthouse in the historic heart of Florence with 360-degree views of the city, including the Duomo and surrounding Renaissance architecture.",
+    status: "active",
+    propertyType: "penthouse",
+    managementLevel: "full-service",
+    bedrooms: 3,
+    bathrooms: 2,
+    areaSqm: 200,
+    floorNumber: "7",
+    listingUrl: "",
+    address: "Via dei Servi 45, 50123 Florence, Italy",
+    latitude: "43.7729",
+    longitude: "11.2567",
+    images: [
+      "https://images.unsplash.com/photo-1499209974033-537250602fbf?q=80&w=1200&auto=format&fit=crop",
+    ],
+    amenities: ["360 Views", "Rooftop Access", "City Center Location"],
+    benefits: ["Premium guest matching"],
+    ownerId: "9",
+    ownerName: "Alessandro Barbieri",
+    ownerAvatarUrl:
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
+    isFeatured: true,
+    icalUrls: [],
+    serviceFee: 85,
+    cleaningFee: 160,
+    taxPct: 10,
+    accountName: "Shaista",
+    bankAccount: "IT34H0300889898000050708893",
   },
 ];
 
-export function findMockPropertyById(id: string): Property | undefined {
-  return MOCK_PROPERTIES.find((property) => property.id === id);
+/**
+ * Find a property by id, returning undefined if not found.
+ */
+export function findPropertyById(id: string | undefined): Property | undefined {
+  if (!id) return undefined;
+  return PROPERTIES.find((property) => property.id === id);
 }
 
 /**
- * Demo nightly rates by property id. Properties have no price field yet, so
- * this is a stand-in used by the calendar/booking estimate. One source of
- * truth (previously duplicated in mockBookings.ts and BookingForm.tsx).
+ * Demo nightly rates by property id. These represent typical booking rates
+ * for calendar/pricing estimates. Replaces duplicated rate tables that were
+ * previously scattered across mockBookings and BookingForm.
  */
-const NIGHTLY_RATES: Record<string, number> = {
+export const NIGHTLY_RATES: Record<string, number> = {
   "1": 1200,
   "2": 850,
   "3": 1600,
@@ -381,8 +564,13 @@ const NIGHTLY_RATES: Record<string, number> = {
   "11": 690,
   "12": 1750,
   "13": 1300,
+  "prop-1": 950,
+  "prop-2": 890,
 };
 
+/**
+ * Get nightly rate for a property, with a sensible default.
+ */
 export function nightlyRateFor(propertyId: string): number {
   return NIGHTLY_RATES[propertyId] ?? 900;
 }

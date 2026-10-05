@@ -2,157 +2,27 @@ import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useRole } from "../../hooks/useRole";
-import ExperienceModal from "../../components/ExperienceModal";
+import { MOCK_EXPERIENCES as SOURCE_EXPERIENCES } from "@/features/experiences/mockExperiences";
+import { EXPERIENCE_CATEGORIES } from "@/features/experiences/types";
 
-// Mock experience data
-const MOCK_EXPERIENCES = [
-  {
-    id: "1",
-    title: "Roman Golf Cart Tour",
-    price: 350,
-    rating: 4.9,
-    image: "/images/experiences/roman-golf-cart.jpg",
-    category: "History & Culture",
-    location: "Rome",
-  },
-  {
-    id: "2",
-    title: "Olive Grove Tasting",
-    price: 100,
-    rating: 4.8,
-    image: "/images/experiences/olive-grove.jpg",
-    category: "Culinary Adventures",
-    location: "Tuscany",
-  },
-  {
-    id: "3",
-    title: "Cooking Class with Authentic Italian Grandmothers",
-    price: 350,
-    rating: 4.9,
-    image: "/images/experiences/cooking-class.jpg",
-    category: "Culinary Adventures",
-    location: "Rome",
-  },
-  {
-    id: "4",
-    title: "Vintage Fiat 500 Tour",
-    price: 350,
-    rating: 4.9,
-    image: "/images/experiences/vintage-fiat.jpg",
-    category: "History & Culture",
-    location: "Rome",
-  },
-  {
-    id: "5",
-    title: "Private Chef at the Villa",
-    price: 420,
-    rating: 5.0,
-    image: "/images/experiences/private-chef.jpg",
-    category: "Culinary Adventures",
-    location: "Tuscany",
-  },
-  {
-    id: "6",
-    title: "Private Coastal Charter",
-    price: 1200,
-    rating: 5.0,
-    image: "/images/experiences/coastal-charter.jpg",
-    category: "Outdoor Tours",
-    location: "Amalfi",
-  },
-  {
-    id: "7",
-    title: "Vatican Museum Private Tour",
-    price: 280,
-    rating: 4.9,
-    image: "/images/experiences/vatican-tour.jpg",
-    category: "History & Culture",
-    location: "Rome",
-  },
-  {
-    id: "8",
-    title: "Wine Tasting in Chianti Valley",
-    price: 150,
-    rating: 4.8,
-    image: "/images/experiences/chianti-wine.jpg",
-    category: "Culinary Adventures",
-    location: "Tuscany",
-  },
-  {
-    id: "9",
-    title: "Hiking in Cinque Terre",
-    price: 120,
-    rating: 4.7,
-    image: "/images/experiences/cinque-terre-hike.jpg",
-    category: "Outdoor Tours",
-    location: "Liguria",
-  },
-  {
-    id: "10",
-    title: "Florence Art Museum Exclusive Access",
-    price: 200,
-    rating: 5.0,
-    image: "/images/experiences/florence-art.jpg",
-    category: "History & Culture",
-    location: "Florence",
-  },
-  {
-    id: "11",
-    title: "Truffle Hunting Experience",
-    price: 250,
-    rating: 4.9,
-    image: "/images/experiences/truffle-hunt.jpg",
-    category: "Culinary Adventures",
-    location: "Piedmont",
-  },
-  {
-    id: "12",
-    title: "Amalfi Coast Boat Excursion",
-    price: 180,
-    rating: 4.8,
-    image: "/images/experiences/amalfi-boat.jpg",
-    category: "Outdoor Tours",
-    location: "Amalfi",
-  },
-  {
-    id: "13",
-    title: "Family Pasta Making Workshop",
-    price: 110,
-    rating: 4.6,
-    image: "/images/experiences/pasta-workshop.jpg",
-    category: "Family",
-    location: "Rome",
-  },
-  {
-    id: "14",
-    title: "Sunset Aperitivo on the Terrace",
-    price: 85,
-    rating: 4.9,
-    image: "/images/experiences/sunset-aperitivo.jpg",
-    category: "At Home",
-    location: "Tuscany",
-  },
-  {
-    id: "15",
-    title: "Exclusive Opera Evening at the Scala",
-    price: 450,
-    rating: 5.0,
-    image: "/images/experiences/opera-scala.jpg",
-    category: "Closed To The Public",
-    location: "Milan",
-  },
-];
+/**
+ * Card view of the shared experience catalogue. Ids match
+ * features/experiences/mockExperiences so a card's "Add to Booking" can
+ * open that experience's detail page (slot picker) by id. Only `active`
+ * experiences are shown, mirroring the marketing site.
+ */
+const MOCK_EXPERIENCES = SOURCE_EXPERIENCES.filter(
+  (e) => e.status === "active",
+).map((e) => ({
+  id: e.id,
+  title: e.name,
+  price: e.pricePerPerson,
+  image: e.images[0] ?? "",
+  category: e.categories[0] ?? "Experience",
+  location: e.location,
+}));
 
-const CATEGORIES = [
-  "All",
-  "History & Culture",
-  "Culinary Adventures",
-  "Outdoor Tours",
-  "Closed To The Public",
-  "Family",
-  "At Home",
-  "One Day City Escape",
-];
+const CATEGORIES = ["All", ...EXPERIENCE_CATEGORIES];
 
 const ITEMS_PER_PAGE = 6;
 
@@ -161,30 +31,31 @@ interface LocationState {
     id: string;
     title: string;
   };
-  selectedExperiences?: Array<{
-    id: string;
-    title: string;
-    price: number;
-    rating: number;
-    image: string;
-    category: string;
-    location: string;
-  }>;
+  selectedExperiences?: SelectedExperience[];
   startDate?: Date | null;
   endDate?: Date | null;
   totalPrice?: number;
   isWishlistFlow?: boolean;
 }
 
-interface Experience {
+/**
+ * An experience in the order summary. `price` is the line total
+ * (pricePerPerson × guests); `slot` and `guests` come from the detail
+ * page's slot picker.
+ */
+interface SelectedExperience {
   id: string;
   title: string;
   price: number;
-  rating: number;
+  pricePerPerson?: number;
   image: string;
   category: string;
   location: string;
+  slot?: string;
+  guests?: number;
 }
+
+type Experience = SelectedExperience;
 
 export default function RequestExperiencePage() {
   const role = useRole();
@@ -206,9 +77,6 @@ export default function RequestExperiencePage() {
   const [selectedExperiences, setSelectedExperiences] =
     useState<Experience[]>(initialExperiences);
   const [wishlistItems, setWishlistItems] = useState<Set<string>>(new Set());
-  const [showModal, setShowModal] = useState(false);
-  const [lastAddedExperience, setLastAddedExperience] =
-    useState<Experience | null>(null);
   const [page, setPage] = useState(1);
   const [scrollY, setScrollY] = useState(0);
 
@@ -221,6 +89,19 @@ export default function RequestExperiencePage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Keep the current history entry's state in sync with the live cart, so
+  // navigating to a detail page and pressing Back restores the CURRENT
+  // selections — not the stale list this page was first opened with (which
+  // would resurrect a removed experience).
+  useEffect(() => {
+    navigate(".", {
+      replace: true,
+      state: { ...state, selectedExperiences },
+    });
+    // Only re-sync when the cart changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedExperiences]);
 
   // Filter experiences
   const filteredExperiences = useMemo(() => {
@@ -242,15 +123,6 @@ export default function RequestExperiencePage() {
     return title.length > maxLength
       ? title.substring(0, maxLength) + "..."
       : title;
-  };
-
-  const handleAddExperience = (experience: Experience) => {
-    if (!selectedExperiences.find((exp) => exp.id === experience.id)) {
-      setSelectedExperiences([...selectedExperiences, experience]);
-      setLastAddedExperience(experience);
-      setShowModal(true);
-      setTimeout(() => setShowModal(false), 3000); // Auto-dismiss after 3 seconds
-    }
   };
 
   const handleRemoveExperience = (experienceId: string) => {
@@ -277,12 +149,8 @@ export default function RequestExperiencePage() {
   );
   const newTotal = totalPrice + experiencesTotal;
 
-  const handleNext = () => {
-    const contactPath =
-      role === "agent"
-        ? `/agent/property/${propertyId}/contact`
-        : `/client/property/${propertyId}/contact`;
-
+  const handleProceedToCheckout = () => {
+    const contactPath = `/${role}/property/${propertyId}/contact`;
     navigate(contactPath, {
       state: {
         property,
@@ -290,13 +158,25 @@ export default function RequestExperiencePage() {
         endDate,
         totalPrice: newTotal,
         experiences: selectedExperiences,
+        // Experience-only checkout: no property/nightly fees, just the
+        // sum of requested experiences.
+        experienceOnly: isWishlistFlow,
       },
+    });
+  };
+
+  // "Add to Booking" on a grid card opens that experience's detail page
+  // (slot picker + guests). Carry the current selections so the detail page
+  // can merge the new one rather than replacing them.
+  const openExperienceDetail = (experienceId: string) => {
+    navigate(`/${role}/experience/${experienceId}`, {
+      state: { existingSelections: selectedExperiences },
     });
   };
 
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900">
-      <main className="mx-auto max-w-[1280px] px-4 py-8 sm:px-8 lg:px-12">
+      <main className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
         {/* Back Button - Hidden in wishlist flow */}
         {!isWishlistFlow && (
           <button
@@ -318,9 +198,9 @@ export default function RequestExperiencePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Left Column - Experiences */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             {/* Category Filters */}
             <div className="mb-8">
               <div className="flex flex-wrap gap-3">
@@ -344,7 +224,7 @@ export default function RequestExperiencePage() {
             </div>
 
             {/* Experience Grid */}
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 mb-12">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 mb-12">
               {paginatedExperiences.map((experience) => {
                 const isSelected = selectedExperiences.find(
                   (exp) => exp.id === experience.id,
@@ -388,12 +268,13 @@ export default function RequestExperiencePage() {
                         €{experience.price} PER GUEST
                       </p>
 
-                      {/* Add/Remove Button */}
+                      {/* Add opens the detail page (slot + guests);
+                          Remove clears it from the order summary. */}
                       <button
                         onClick={() =>
                           isSelected
                             ? handleRemoveExperience(experience.id)
-                            : handleAddExperience(experience)
+                            : openExperienceDetail(experience.id)
                         }
                         className={`w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all cursor-pointer ${
                           isSelected
@@ -492,10 +373,19 @@ export default function RequestExperiencePage() {
                     {selectedExperiences.map((exp) => (
                       <div
                         key={exp.id}
-                        className="flex justify-between items-start"
+                        className="flex justify-between items-start gap-2"
                       >
                         <span className="text-xs text-neutral-600 flex-1">
                           {trimTitle(exp.title)}
+                          {(exp.slot || exp.guests) && (
+                            <span className="block text-[11px] text-neutral-400">
+                              {exp.slot}
+                              {exp.slot && exp.guests ? " · " : ""}
+                              {exp.guests
+                                ? `${exp.guests} guest${exp.guests === 1 ? "" : "s"}`
+                                : ""}
+                            </span>
+                          )}
                         </span>
                         <span className="text-xs font-medium text-neutral-900">
                           €{exp.price}
@@ -523,34 +413,20 @@ export default function RequestExperiencePage() {
                 )}
               </div>
 
-              {/* Back and Next Buttons */}
+              {/* Proceed to Checkout */}
               <div className="space-y-3">
                 <button
-                  onClick={handleNext}
-                  className="w-full py-3 px-4 bg-neutral-900 text-white font-semibold text-sm rounded-lg hover:bg-black transition-all cursor-pointer"
+                  onClick={handleProceedToCheckout}
+                  disabled={selectedExperiences.length === 0}
+                  className="w-full py-3 px-4 bg-neutral-900 text-white font-semibold text-sm rounded-lg hover:bg-black transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Next
+                  Proceed to Checkout
                 </button>
               </div>
             </div>
           </div>
         </div>
       </main>
-
-      {/* Success Modal */}
-      {lastAddedExperience && (
-        <ExperienceModal
-          isOpen={showModal}
-          experience={lastAddedExperience}
-          onClose={() => {
-            setShowModal(false);
-            // If wishlist flow, redirect to bookings after modal closes
-            if (isWishlistFlow) {
-              setTimeout(() => navigate("/client/bookings"), 500);
-            }
-          }}
-        />
-      )}
     </div>
   );
 }
