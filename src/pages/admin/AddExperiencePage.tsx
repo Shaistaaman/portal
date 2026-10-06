@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddExperienceWizard from "@/features/experiences/AddExperienceWizard";
-import { EXPERIENCE_CREATION_STATUS } from "@/features/experiences/types";
+import { EXPERIENCE_CREATION_STATUS } from "@/types/experiences";
 
 export default function AdminAddExperiencePage() {
   const navigate = useNavigate();

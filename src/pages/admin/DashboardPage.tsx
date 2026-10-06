@@ -14,7 +14,7 @@ import {
   bookingNumbers,
   type Booking,
   type BookingStatus,
-} from "@/features/calendar/types";
+} from "@/types/calendar";
 import { allowedTransitions } from "@/features/calendar/transitions";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import ConfirmModal from "@/components/ui/ConfirmModal";

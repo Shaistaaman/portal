@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddBlogWizard from "@/features/blogs/AddBlogWizard";
-import { BLOG_CREATION_STATUS } from "@/features/blogs/types";
+import { BLOG_CREATION_STATUS } from "@/types/blogs";
 
 export default function AdminAddBlogPage() {
   const navigate = useNavigate();

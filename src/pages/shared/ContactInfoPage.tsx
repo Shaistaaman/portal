@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { useRole } from "../../hooks/useRole";
-import { nextBookingNumberForMonth } from "@/features/calendar/types";
+import { nextBookingNumberForMonth } from "@/types/calendar";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 
 interface LocationState {

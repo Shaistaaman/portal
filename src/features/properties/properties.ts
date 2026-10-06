@@ -1,4 +1,4 @@
-import type { Property } from "./types";
+import type { Property } from "../../types/properties";
 
 /**
  * Unified mock property catalogue. Single source of truth for all properties
@@ -33,6 +33,9 @@ export const PROPERTIES: Property[] = [
     longitude: "11.8899",
     images: [
       "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
     ],
     amenities: ["Private Infinity Pool", "Wine Cellar", "Panoramic Sea View"],
     benefits: ["Luxury positioning", "Dedicated account manager"],
@@ -42,6 +45,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: ["https://calendar.example.com/villa-toscana.ics"],
+    nightlyRate: 1200,
     serviceFee: 100,
     cleaningFee: 200,
     taxPct: 10,
@@ -67,6 +71,9 @@ export const PROPERTIES: Property[] = [
     longitude: "12.4768",
     images: [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1200&auto=format&fit=crop",
     ],
     amenities: ["Concierge Service", "Smart Home System"],
     benefits: ["Restyling and branding"],
@@ -76,6 +83,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 850,
     serviceFee: 75,
     cleaningFee: 150,
     taxPct: 10,
@@ -110,6 +118,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1600,
     serviceFee: 125,
     cleaningFee: 250,
     taxPct: 10,
@@ -146,6 +155,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1200,
     serviceFee: 100,
     cleaningFee: 180,
     taxPct: 10,
@@ -180,6 +190,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: [],
+    nightlyRate: 850,
     serviceFee: 85,
     cleaningFee: 160,
     taxPct: 10,
@@ -214,6 +225,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1600,
     serviceFee: 150,
     cleaningFee: 280,
     taxPct: 10,
@@ -248,6 +260,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: [],
+    nightlyRate: 1000,
     serviceFee: 90,
     cleaningFee: 170,
     taxPct: 10,
@@ -282,6 +295,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 950,
     serviceFee: 120,
     cleaningFee: 220,
     taxPct: 10,
@@ -316,6 +330,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1400,
     serviceFee: 70,
     cleaningFee: 140,
     taxPct: 10,
@@ -354,6 +369,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1100,
     serviceFee: 130,
     cleaningFee: 240,
     taxPct: 10,
@@ -388,6 +404,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1300,
     serviceFee: 80,
     cleaningFee: 150,
     taxPct: 10,
@@ -426,6 +443,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 780,
     serviceFee: 140,
     cleaningFee: 260,
     taxPct: 10,
@@ -462,15 +480,15 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: false,
     icalUrls: [],
+    nightlyRate: 1550,
     serviceFee: 110,
     cleaningFee: 200,
     taxPct: 10,
     accountName: "Skylife Italy",
     bankAccount: "IT34H0300889898000050708893",
   },
-  // Wishlist demo properties — ids match the wishlist entries
   {
-    id: "prop-1",
+    id: "14",
     name: "Tiber Luxury Penthouse",
     location: "Rome, Italy",
     description:
@@ -497,6 +515,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: [],
+    nightlyRate: 690,
     serviceFee: 95,
     cleaningFee: 180,
     taxPct: 10,
@@ -504,7 +523,7 @@ export const PROPERTIES: Property[] = [
     bankAccount: "IT34H0300889898000050708893",
   },
   {
-    id: "prop-2",
+    id: "15",
     name: "360 Penthouse",
     location: "Florence, Italy",
     description:
@@ -531,6 +550,7 @@ export const PROPERTIES: Property[] = [
       "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=256&auto=format&fit=crop",
     isFeatured: true,
     icalUrls: [],
+    nightlyRate: 1750,
     serviceFee: 85,
     cleaningFee: 160,
     taxPct: 10,
@@ -545,32 +565,4 @@ export const PROPERTIES: Property[] = [
 export function findPropertyById(id: string | undefined): Property | undefined {
   if (!id) return undefined;
   return PROPERTIES.find((property) => property.id === id);
-}
-
-/**
- * Demo nightly rates by property id. These represent typical booking rates
- * for calendar/pricing estimates. Replaces duplicated rate tables that were
- * previously scattered across mockBookings and BookingForm.
- */
-export const NIGHTLY_RATES: Record<string, number> = {
-  "1": 1200,
-  "2": 850,
-  "3": 1600,
-  "5": 950,
-  "6": 1400,
-  "7": 1100,
-  "9": 780,
-  "10": 1550,
-  "11": 690,
-  "12": 1750,
-  "13": 1300,
-  "prop-1": 950,
-  "prop-2": 890,
-};
-
-/**
- * Get nightly rate for a property, with a sensible default.
- */
-export function nightlyRateFor(propertyId: string): number {
-  return NIGHTLY_RATES[propertyId] ?? 900;
 }

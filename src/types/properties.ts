@@ -75,6 +75,8 @@ export interface Property {
    * These override the org-wide defaults when set. Org defaults live in
    * the calendar feature's OrgFees (cleaning 150, service 75, taxes 10%).
    */
+  /** Nightly booking rate in euros per night. */
+  nightlyRate?: number;
   serviceFee?: number;
   cleaningFee?: number;
   /** Tax rate as a percentage, e.g. 10 means 10% — not a fraction. */
@@ -136,6 +138,7 @@ export type PropertyFormValues = Pick<
       | "address"
       | "latitude"
       | "longitude"
+      | "nightlyRate"
       | "serviceFee"
       | "cleaningFee"
       | "taxPct"
@@ -207,6 +210,7 @@ export const EMPTY_PROPERTY_FORM_VALUES: PropertyFormValues = {
   icalUrls: [],
   amenities: [],
   benefits: [],
+  nightlyRate: 0,
   serviceFee: 0,
   cleaningFee: 0,
   taxPct: 0,

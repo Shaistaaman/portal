@@ -5,7 +5,7 @@ import {
   createBlogSection,
   type BlogFormValues,
   type BlogSection,
-} from "./types";
+} from "../../types/blogs";
 
 type WizardStep = "identity" | "details";
 
@@ -197,7 +197,10 @@ export default function AddBlogWizard({
               Banner Image
             </label>
             {values.bannerImage ? (
-              <div className="relative w-full rounded-lg overflow-hidden border border-neutral-200" style={{ aspectRatio: "16/6" }}>
+              <div
+                className="relative w-full rounded-lg overflow-hidden border border-neutral-200"
+                style={{ aspectRatio: "16/6" }}
+              >
                 <img
                   src={values.bannerImage}
                   alt="Banner"

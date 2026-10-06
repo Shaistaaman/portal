@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { MOCK_PACKAGES } from "./mockPackages";
-import type { Package, PackageStatus } from "./types";
+import type { Package, PackageStatus } from "../../types/packages";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -306,8 +306,8 @@ export default function PackageList() {
         <img
           src={selectedPackage.images[0]}
           alt={selectedPackage.name}
-          className="w-full max-w-lg rounded-lg object-cover mb-6"
-          style={{ aspectRatio: "3/2" }}
+          className="w-full rounded-lg object-cover mb-6"
+          style={{ aspectRatio: "16/6" }}
         />
 
         {selectedPackage.inclusions.length > 0 && (

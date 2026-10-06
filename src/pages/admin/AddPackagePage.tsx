@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddPackageWizard from "@/features/packages/AddPackageWizard";
-import { PACKAGE_CREATION_STATUS } from "@/features/packages/types";
+import { PACKAGE_CREATION_STATUS } from "@/types/packages";
 
 export default function AdminAddPackagePage() {
   const navigate = useNavigate();

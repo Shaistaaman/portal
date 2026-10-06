@@ -1,6 +1,6 @@
 import type { UserRole } from "@/types/auth";
-import type { Booking, BookingStatus } from "./types";
-import { isCheckoutPassed } from "./types";
+import type { Booking, BookingStatus } from "../../types/calendar";
+import { isCheckoutPassed } from "../../types/calendar";
 
 /**
  * Allowed manual status transitions, per Project_Specification.md §4.5.

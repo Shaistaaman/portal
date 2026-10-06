@@ -104,6 +104,112 @@ Notes:
 - Only `active` properties are visible in agent/client-facing browsing and booking flows. Agent access to properties is **view-only** — no add/edit, no approve/reject, no activate/deactivate.
 - Admin sees all statuses on all properties at all times. Owner sees all statuses, scoped to their own properties only.
 
+### 4.0 Property Versioning & Edit Workflow (Admin ↔ Owner)
+
+**Problem solved:** When an owner edits a published (active) property and resubmits it for review, the property should remain visible on the public site with its last-approved data while the new edits await admin review. Previous approach would take the property offline, breaking user discovery and bookings.
+
+**Solution:** Complete property history with immutable revisions. Every property maintains a single ID across its lifetime. Each submission (create, edit, resubmit after rejection, or rollback) creates a new immutable revision row with a full snapshot of all fields at that moment. The `properties` table always points to the `current_revision_id` — the approved revision currently live.
+
+**Key behaviors:**
+
+1. **Initial creation (owner or admin):**
+   - Creates `properties` row (status: `in_review`)
+   - Creates `property_revisions` revision 1 (type: `create`, status: `in_review`)
+   - Property is **not visible** to public until approved
+
+2. **Owner edits live property:**
+   - Property remains `active` (visible on public site with current revision data)
+   - Creates new `property_revisions` row (type: `edit`, status: `in_review`)
+   - **Property never goes offline** — old revision stays live while new one awaits review
+
+3. **Admin reviews edit:**
+   - **Approve:** atomically copies new revision snapshot → `properties` row, sets `current_revision_id`, marks revision `approved`
+   - **Reject:** marks revision `rejected` with admin note; property unaffected (old revision stays live)
+
+4. **Owner resubmits rejected edit:**
+   - Re-edits the same rejected revision row (status: `rejected` → `in_review`)
+   - No need to create a new revision; same revision gets edited until it passes review
+
+5. **Rollback (admin-only):**
+   - Admin picks an old approved revision from history
+   - System creates new revision (type: `rollback`) copying that snapshot
+   - Admin approves it; new revision becomes current, history stays intact
+
+6. **Visibility & history:**
+   - Public API reads only `current_revision_id` (always approved)
+   - Owner dashboard shows: property status, current revision number, pending edit indicator
+   - Admin dashboard shows: all revisions for each property, version info, approval/rejection timeline
+   - History tab: complete timeline of who submitted, who approved, when, and what changed
+
+**Database:** See `Documents/database-design.md` §3 (Property Versioning section) for the full schema — `property_revisions` table stores every submission with full snapshot, revision number, status, submitter, reviewer, and notes. Unique constraint enforces only one open (draft/in_review/rejected) revision per property at a time.
+
+**S3 image handling:**
+
+- New/pending images stored at `properties/{property_id}/{revision_id}/...`
+- When a revision is approved, old images copied to archive/ prefix (fresh creation date resets the 30-day TTL)
+- Rejected revisions' images moved to archive/ after 30 days
+
+### 4.1 Property Review Queue & Admin Dashboard
+
+**Overview:** Admin-exclusive dashboard showing all pending property revisions awaiting approval/rejection. Owners can view only their own pending properties (read-only, no action buttons).
+
+**Admin view:**
+
+- 6-column table: Property Name | Owner Name | Type | Version | Status | Actions
+- Sortable, paginated (8 items/page)
+- Action buttons per row: **Approve** (green) | **Reject** (red)
+- Clicking property name navigates to read-only edit view showing the pending revision data
+- All submitted properties visible (initial creates + edits + resubmissions)
+
+**Owner view (if accessing Review Queue):**
+
+- Same table structure, but filtered to own properties only
+- No action buttons — read-only view to see submission status
+- Clicking property name also navigates to read-only view
+
+**Approve/Reject workflow (modal-based):**
+
+1. **Approve Modal**
+   - Title: "Approve Revision"
+   - Message: `"Approve revision 1 for \"Tiber Luxury Penthouse\"?"`
+   - Confirm button: "Approve" (black style)
+   - On confirm: marks revision `approved`, updates `properties.current_revision_id`, property goes `active` if first submission
+
+2. **Reject Modal**
+   - Title: "Reject Revision"
+   - Message: `"Reject revision 1 for \"Tiber Luxury Penthouse\"?"`
+   - Includes required textarea: "Reason for rejection (required)"
+   - Confirm button: "Reject" (red, destructive style)
+   - Disabled until rejection reason filled
+   - On confirm: marks revision `rejected`, stores reason in `reviewed_at`/`review_note` fields
+
+**Edit view (read-only mode):**
+
+- All form fields disabled (gray background)
+- Blue info banner: "Viewing pending revision — This is the data submitted for review. Fields are read-only."
+- Wizard progresses through all steps normally (user can browse the full submission)
+- Last step (normally "Ownership" for admin): shows **Approve** and **Reject** buttons (admin only)
+- Last step for owner: shows only back button (no actions)
+- Triggering Approve/Reject opens the confirmation modal
+
+**Review Queue integration:**
+
+- Shown as a separate tab or link on Admin Properties dashboard
+- Count badge shows pending revision count (admin sees all, owner sees own)
+- Quick visual status: "Pending Review" (yellow) | "Rejected" (red)
+- Type indicators: "New Property" (blue) | "Edited" (purple) | "Resubmitted" (indigo)
+- Rollback within 30 days: copy images back from archive/ to live prefix
+- Rollback after 30 days: text/data OK, admin can approve and ask owner to re-upload images (UI shows "expired images")
+- AWS TODO: Configure S3 lifecycle rule to expire `archive/` prefix after 30 days
+
+**UI updates (tracked separately in §6 Change Log):**
+
+- Owner can edit at any time; pending edits don't block live visibility
+- Owner sees pending edit badge + "Changes pending review" alert on property detail
+- Admin Review Queue: dedicated tab showing all pending decisions (new properties, edits, resubmissions)
+- Admin history tab: view all revisions, compare versions, approve/reject, rollback to any approved version
+- No duplicate property IDs: single ID throughout, revision tracking keeps the full audit trail
+
 ### 4.1 Featured properties (admin-only, capped per city)
 
 - Every property has an `isFeatured` boolean, set **only by admin** — never exposed to the owner-facing add/edit form.
@@ -269,3 +375,5 @@ Update this section (or replace it with the latest state) at the end of each wor
 - **Rejected property added for testing** — new mock property id 13 "Portofino Harbor Villa" (owned by Giulia Romano, status: rejected, rejection reason: "Property documentation incomplete…"). Allows testing owner's resubmit flow on Properties page.
 - **Owner menu icons updated** — OwnerLayout now uses lucide-react icons: LayoutDashboard (Dashboard), Building2 (Properties), Calendar (Calendar), DollarSign (Financial). Matches Admin layout icon set for consistency.
 - **Admin dashboard icon updated** — Dashboard nav item now uses LayoutDashboard icon (instead of Home) in AdminLayout via admin-nav.ts, matching Owner layout and modern lucide icon set.
+- **Property versioning system designed** — added comprehensive §4.0 to Project_Specification documenting the revision-tracking system that solves the "public visibility during edit review" problem. Complete audit trail via immutable `property_revisions` table: every property keeps a single ID across its lifetime, with each submission (create/edit/rollback) creating an immutable revision row with full snapshot. Approved revisions stay live while edits await review—property never goes offline. Database schema (`property_revisions`, `property_revision_type`, `property_revision_status` enums) and migration strategy documented in `Documents/database-design.md`. Owner/Admin UI updates (pending badges, version info, review queue, history tab) tracked separately. AWS TODO items: backfill migration for existing properties, image storage versioning, S3 lifecycle rules for 30-day image archival, audit logging for approval transactions.
+- **Property versioning implementation completed** (Phases 2-3) — (Phase 2: Backend Logic) Created `property-revision.ts` with comprehensive TypeScript types (PropertyRevisionRow, enums, validation functions) and `property-revision-service.ts` with atomic transaction handlers: `approveRevision()` copies snapshot + updates references, `rejectRevision()` marks rejected with note, `rollbackRevision()` creates auto-approved rollback revision. Mock database layer for testing. (Phase 3: UI Components) Created `PropertyReviewQueue.tsx` (admin review table, 8 items/page, pagination, approve/reject actions), `PropertyHistory.tsx` (revision timeline with expand/collapse, rollback buttons, rejection notes). Updated `PropertyList.tsx` with `PendingBadge` (status-colored badge) and `VersionInfo` (v2 live → v3 pending) components. Updated `AdminPropertiesPage.tsx` with 3-tab nav (All/ReviewQueue/History) + pending count badge. Updated `OwnerPropertiesPage.tsx` with 2-tab nav (MyProperties/History). Updated `OwnerDashboardPage.tsx` with orange warning banner: "⚠️ You have N pending edits" + "View Properties" CTA button. All UI wired to property-revision-service; TypeScript enforces correct data shapes. Ready for backend API integration.

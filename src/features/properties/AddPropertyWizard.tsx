@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Upload, X, Plus } from "lucide-react";
 import { MOCK_USERS } from "@/features/user-management/mockUsers";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import {
   DEFAULT_ADMIN_ONLY_FIELDS,
   EMPTY_PROPERTY_FORM_VALUES,
@@ -14,7 +15,7 @@ import {
   type PropertyFormValues,
   type PropertyManagementLevel,
   type PropertyType,
-} from "./types";
+} from "../../types/properties";
 
 type WizardStep =
   | "management"
@@ -103,11 +104,15 @@ function mergeInitialValues(
 export interface AddPropertyWizardProps {
   role: "admin" | "owner";
   mode?: "add" | "edit";
+  isReadOnly?: boolean;
   initialValues?: Partial<PropertyFormValues>;
   initialManagementLevel?: PropertyManagementLevel | "";
   initialIsFeatured?: boolean;
   /** Admin edit only — which owner the property is currently assigned to. */
   initialOwnerId?: string;
+  /** Revision metadata for read-only mode (when viewing a pending revision). */
+  revisionNo?: number;
+  revisionTitle?: string;
   onSubmit: (
     values: PropertyFormValues,
     adminFields: AdminOnlyPropertyFields,
@@ -127,10 +132,13 @@ export interface AddPropertyWizardProps {
 export default function AddPropertyWizard({
   role,
   mode = "add",
+  isReadOnly = false,
   initialValues,
   initialManagementLevel = "",
   initialIsFeatured = false,
   initialOwnerId = "",
+  revisionNo,
+  revisionTitle,
   onSubmit,
   onClose,
 }: AddPropertyWizardProps) {
@@ -147,6 +155,10 @@ export default function AddPropertyWizard({
   const [ownerId, setOwnerId] = useState(initialOwnerId);
   const [brochureFile, setBrochureFile] = useState<File | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [revisionAction, setRevisionAction] = useState<
+    "approve" | "reject" | null
+  >(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const update = <K extends keyof PropertyFormValues>(
     key: K,
@@ -281,6 +293,28 @@ export default function AddPropertyWizard({
     onClose();
   };
 
+  const handleApprove = () => {
+    // TODO: Implement approve logic with backend API
+    console.log("Approving revision...");
+    setRevisionAction(null);
+    // TODO: Call backend API to approve revision
+    // After success, close the wizard and navigate back
+    onClose();
+  };
+
+  const handleReject = () => {
+    // TODO: Implement reject logic with backend API
+    if (!rejectionReason.trim()) {
+      return;
+    }
+    console.log(`Rejecting revision with reason: ${rejectionReason}`);
+    setRevisionAction(null);
+    setRejectionReason("");
+    // TODO: Call backend API to reject revision with reason
+    // After success, close the wizard and navigate back
+    onClose();
+  };
+
   if (showSuccess) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -374,7 +408,8 @@ export default function AddPropertyWizard({
               type="text"
               value={values.name}
               onChange={(e) => update("name", e.target.value)}
-              className={inputClass}
+              disabled={isReadOnly}
+              className={getInputClass(isReadOnly)}
             />
           </Field>
           <Field label="Location">
@@ -383,7 +418,8 @@ export default function AddPropertyWizard({
               value={values.location}
               onChange={(e) => update("location", e.target.value)}
               placeholder="Rome, Italy"
-              className={inputClass}
+              disabled={isReadOnly}
+              className={getInputClass(isReadOnly)}
             />
           </Field>
           <Field label="Address">
@@ -392,7 +428,8 @@ export default function AddPropertyWizard({
               value={values.address}
               onChange={(e) => update("address", e.target.value)}
               placeholder="Via del Corso 12, 00186 Roma RM"
-              className={inputClass}
+              disabled={isReadOnly}
+              className={getInputClass(isReadOnly)}
             />
             <p className="text-xs text-neutral-500 mt-1.5">
               Full street address. Not shown publicly — used for guest
@@ -407,7 +444,8 @@ export default function AddPropertyWizard({
                 value={values.latitude}
                 onChange={(e) => update("latitude", e.target.value)}
                 placeholder="41.9028"
-                className={inputClass}
+                disabled={isReadOnly}
+                className={getInputClass(isReadOnly)}
               />
             </Field>
             <Field label="Longitude (optional)">
@@ -417,7 +455,8 @@ export default function AddPropertyWizard({
                 value={values.longitude}
                 onChange={(e) => update("longitude", e.target.value)}
                 placeholder="12.4964"
-                className={inputClass}
+                disabled={isReadOnly}
+                className={getInputClass(isReadOnly)}
               />
             </Field>
           </div>
@@ -427,7 +466,7 @@ export default function AddPropertyWizard({
                 title="Property location preview"
                 src={mapUrl}
                 className="h-48 w-full"
-                loading="lazy"
+                loading="eager"
               />
             </div>
           )}
@@ -436,13 +475,18 @@ export default function AddPropertyWizard({
               value={values.description}
               onChange={(e) => update("description", e.target.value)}
               rows={5}
-              className={inputClass}
+              disabled={isReadOnly}
+              className={getInputClass(isReadOnly)}
             />
           </Field>
           <Field label="Property Brochure (optional)">
             <label
               htmlFor="brochure-upload"
-              className="flex items-center gap-2 px-4 py-3 border border-dashed border-neutral-300 rounded-lg text-sm text-neutral-600 hover:border-neutral-400 transition-colors cursor-pointer"
+              className={`flex items-center gap-2 px-4 py-3 border border-dashed border-neutral-300 rounded-lg text-sm transition-colors ${
+                isReadOnly
+                  ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
+                  : "text-neutral-600 hover:border-neutral-400 cursor-pointer"
+              }`}
             >
               <Upload className="w-4 h-4" />
               {brochureFile ? brochureFile.name : "Click to upload (PDF/DOC)"}
@@ -454,6 +498,7 @@ export default function AddPropertyWizard({
                 onChange={(e) =>
                   handleBrochureSelect(e.target.files?.[0] ?? null)
                 }
+                disabled={isReadOnly}
               />
             </label>
           </Field>
@@ -467,13 +512,15 @@ export default function AddPropertyWizard({
                     value={url}
                     onChange={(e) => updateIcalUrl(index, e.target.value)}
                     placeholder="https://calendar.example.com/feed.ics"
-                    className={inputClass}
+                    disabled={isReadOnly}
+                    className={getInputClass(isReadOnly)}
                   />
                   <button
                     type="button"
                     onClick={() => removeIcalUrl(index)}
+                    disabled={isReadOnly}
                     aria-label={`Remove iCal link ${index + 1}`}
-                    className="shrink-0 p-3 text-neutral-400 hover:text-red-600 border border-neutral-300 rounded-lg transition-colors cursor-pointer"
+                    className="shrink-0 p-3 text-neutral-400 hover:text-red-600 border border-neutral-300 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -483,7 +530,8 @@ export default function AddPropertyWizard({
                 <button
                   type="button"
                   onClick={addIcalUrl}
-                  className="flex items-center gap-1.5 px-4 py-2.5 border border-neutral-300 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  disabled={isReadOnly}
+                  className="flex items-center gap-1.5 px-4 py-2.5 border border-neutral-300 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                   Add iCal link
@@ -499,7 +547,7 @@ export default function AddPropertyWizard({
           <Field
             label={`Property Images (${MIN_PROPERTY_IMAGES}–${MAX_PROPERTY_IMAGES}, up to 10MB each)`}
           >
-            {values.images.length < MAX_PROPERTY_IMAGES ? (
+            {values.images.length < MAX_PROPERTY_IMAGES && !isReadOnly ? (
               <label
                 htmlFor="images-upload"
                 className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-neutral-300 rounded-lg text-neutral-500 hover:border-neutral-400 transition-colors cursor-pointer"
@@ -517,8 +565,9 @@ export default function AddPropertyWizard({
               </label>
             ) : (
               <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-neutral-200 rounded-lg text-xs text-neutral-500">
-                Maximum of {MAX_PROPERTY_IMAGES} images reached. Remove one to
-                add another.
+                {isReadOnly
+                  ? "Read-only mode"
+                  : `Maximum of ${MAX_PROPERTY_IMAGES} images reached. Remove one to add another.`}
               </div>
             )}
             <p
@@ -529,7 +578,7 @@ export default function AddPropertyWizard({
               }`}
             >
               {values.images.length} of {MAX_PROPERTY_IMAGES} added
-              {values.images.length < MIN_PROPERTY_IMAGES
+              {values.images.length < MIN_PROPERTY_IMAGES && !isReadOnly
                 ? ` — add at least ${
                     MIN_PROPERTY_IMAGES - values.images.length
                   } more to continue`
@@ -552,8 +601,9 @@ export default function AddPropertyWizard({
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
+                    disabled={isReadOnly}
                     aria-label={`Remove image ${index + 1}`}
-                    className="absolute top-1.5 right-1.5 p-1 bg-white/90 rounded-full text-neutral-700 hover:bg-white transition-colors cursor-pointer"
+                    className="absolute top-1.5 right-1.5 p-1 bg-white/90 rounded-full text-neutral-700 hover:bg-white transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -573,13 +623,15 @@ export default function AddPropertyWizard({
               min={1}
               max={12}
               onChange={(v) => update("bedrooms", v)}
+              isReadOnly={isReadOnly}
             />
             <Field label="Area (sqm)">
               <input
                 type="number"
                 value={values.areaSqm || ""}
                 onChange={(e) => update("areaSqm", Number(e.target.value))}
-                className={inputClass}
+                disabled={isReadOnly}
+                className={getInputClass(isReadOnly)}
               />
             </Field>
             <Field label="Property Type">
@@ -594,6 +646,7 @@ export default function AddPropertyWizard({
                       name="propertyType"
                       checked={values.propertyType === type.value}
                       onChange={() => update("propertyType", type.value)}
+                      disabled={isReadOnly}
                     />
                     {type.label}
                   </label>
@@ -609,13 +662,15 @@ export default function AddPropertyWizard({
               min={1}
               max={12}
               onChange={(v) => update("bathrooms", v)}
+              isReadOnly={isReadOnly}
             />
             <Field label="Floor Number (optional)">
               <input
                 type="text"
                 value={values.floorNumber}
                 onChange={(e) => update("floorNumber", e.target.value)}
-                className={inputClass}
+                disabled={isReadOnly}
+                className={getInputClass(isReadOnly)}
               />
             </Field>
             <Field label="Management Benefits">
@@ -629,6 +684,7 @@ export default function AddPropertyWizard({
                       type="checkbox"
                       checked={values.benefits.includes(benefit)}
                       onChange={() => toggleBenefit(benefit)}
+                      disabled={isReadOnly}
                     />
                     {benefit}
                   </label>
@@ -643,7 +699,8 @@ export default function AddPropertyWizard({
                 type="url"
                 value={values.listingUrl}
                 onChange={(e) => update("listingUrl", e.target.value)}
-                className={inputClass}
+                disabled={isReadOnly}
+                className={getInputClass(isReadOnly)}
               />
             </Field>
           </div>
@@ -662,6 +719,7 @@ export default function AddPropertyWizard({
                   type="checkbox"
                   checked={values.amenities.includes(amenity)}
                   onChange={() => toggleAmenity(amenity)}
+                  disabled={isReadOnly}
                 />
                 {amenity}
               </label>
@@ -683,15 +741,28 @@ export default function AddPropertyWizard({
           </div>
 
           <div className="grid grid-cols-2 gap-6">
+            <div>
+              <MoneyField
+                label="Nightly Rate"
+                value={values.nightlyRate}
+                onChange={(v) => update("nightlyRate", v)}
+                isReadOnly={isReadOnly}
+              />
+              <p className="text-xs text-neutral-500 mt-1.5">
+                Nightly booking rate in euros per night
+              </p>
+            </div>
             <MoneyField
               label="Service Fee"
               value={values.serviceFee}
               onChange={(v) => update("serviceFee", v)}
+              isReadOnly={isReadOnly}
             />
             <MoneyField
               label="Cleaning Fee"
               value={values.cleaningFee}
               onChange={(v) => update("cleaningFee", v)}
+              isReadOnly={isReadOnly}
             />
 
             <Field label="Tax %">
@@ -704,7 +775,8 @@ export default function AddPropertyWizard({
                   value={values.taxPct || ""}
                   onChange={(e) => update("taxPct", Number(e.target.value))}
                   placeholder="10"
-                  className={`${inputClass} pr-9`}
+                  disabled={isReadOnly}
+                  className={`${getInputClass(isReadOnly)} pr-9`}
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-neutral-500 pointer-events-none">
                   %
@@ -722,7 +794,8 @@ export default function AddPropertyWizard({
                 onChange={(e) => update("accountName", e.target.value)}
                 placeholder="e.g. Skylife Italy"
                 autoComplete="off"
-                className={inputClass}
+                disabled={isReadOnly}
+                className={getInputClass(isReadOnly)}
               />
               <p className="text-xs text-neutral-500 mt-1.5">
                 Name on the account, shown to guests on the payment page.
@@ -739,7 +812,8 @@ export default function AddPropertyWizard({
                 placeholder="IT60 X054 2811 1010 0000 0123 456"
                 autoComplete="off"
                 spellCheck={false}
-                className={`${inputClass} font-mono tracking-wide`}
+                disabled={isReadOnly}
+                className={`${getInputClass(isReadOnly)} font-mono tracking-wide`}
               />
               <p className="text-xs text-neutral-500 mt-1.5">
                 Account that receives payouts for this property.
@@ -765,7 +839,8 @@ export default function AddPropertyWizard({
             <select
               value={ownerId}
               onChange={(e) => setOwnerId(e.target.value)}
-              className={`${inputClass} cursor-pointer`}
+              disabled={isReadOnly}
+              className={`${getInputClass(isReadOnly)} cursor-pointer`}
             >
               <option value="">Unassigned</option>
               {ownerOptions.map((owner) => (
@@ -830,25 +905,106 @@ export default function AddPropertyWizard({
               Back
             </button>
           )}
-          <button
-            type="button"
-            onClick={goNext}
-            disabled={
-              (currentStep === "management" && !managementLevel) ||
-              !canLeaveCurrentStep
-            }
-            className="px-6 py-3 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {isLastStep ? "Submit" : "Continue"}
-          </button>
+          {!isLastStep && (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={
+                (currentStep === "management" && !managementLevel) ||
+                !canLeaveCurrentStep
+              }
+              className="px-6 py-3 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Continue
+            </button>
+          )}
+          {isLastStep && !isReadOnly && (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={
+                (currentStep === "management" && !managementLevel) ||
+                !canLeaveCurrentStep
+              }
+              className="px-6 py-3 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Submit
+            </button>
+          )}
+          {isReadOnly && isLastStep && role === "admin" && (
+            <>
+              <button
+                type="button"
+                onClick={() => setRevisionAction("approve")}
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+              >
+                Approve
+              </button>
+              <button
+                type="button"
+                onClick={() => setRevisionAction("reject")}
+                className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+              >
+                Reject
+              </button>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Approve/Reject Modal */}
+      {isReadOnly && isLastStep && role === "admin" && revisionAction && (
+        <ConfirmModal
+          title={
+            revisionAction === "approve"
+              ? "Approve Revision"
+              : "Reject Revision"
+          }
+          message={`${revisionAction === "approve" ? "Approve" : "Reject"} revision ${revisionNo || 1} for "${revisionTitle || initialValues?.name || "untitled"}"?`}
+          confirmLabel={revisionAction === "approve" ? "Approve" : "Reject"}
+          destructive={revisionAction === "reject"}
+          confirmDisabled={
+            revisionAction === "reject" && !rejectionReason.trim()
+          }
+          onCancel={() => {
+            setRevisionAction(null);
+            setRejectionReason("");
+          }}
+          onConfirm={
+            revisionAction === "approve" ? handleApprove : handleReject
+          }
+        >
+          {revisionAction === "reject" && (
+            <div>
+              <label
+                htmlFor="rejection-reason"
+                className="text-xs font-semibold text-neutral-700 mb-1.5 block"
+              >
+                Reason for rejection (required)
+              </label>
+              <textarea
+                id="rejection-reason"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Explain why this revision is being rejected..."
+                rows={3}
+                className="w-full px-3 py-2 bg-white border border-neutral-300 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-black transition"
+              />
+            </div>
+          )}
+        </ConfirmModal>
+      )}
     </div>
   );
 }
 
 const inputClass =
   "w-full px-4 py-3 bg-white border border-neutral-300 text-neutral-900 placeholder:text-neutral-500 text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-black transition";
+
+const getInputClass = (isReadOnly: boolean = false) =>
+  isReadOnly
+    ? "w-full px-4 py-3 bg-neutral-100 border border-neutral-300 text-neutral-900 text-sm rounded-lg cursor-not-allowed"
+    : inputClass;
 
 function Field({
   label,
@@ -876,10 +1032,12 @@ function MoneyField({
   label,
   value,
   onChange,
+  isReadOnly = false,
 }: {
   label: string;
   value: number;
   onChange: (value: number) => void;
+  isReadOnly?: boolean;
 }) {
   return (
     <Field label={label}>
@@ -894,7 +1052,8 @@ function MoneyField({
           value={value || ""}
           onChange={(e) => onChange(Number(e.target.value))}
           placeholder="0"
-          className={`${inputClass} pl-9`}
+          disabled={isReadOnly}
+          className={`${getInputClass(isReadOnly)} pl-9`}
         />
       </div>
     </Field>
@@ -907,12 +1066,14 @@ function Stepper({
   min,
   max,
   onChange,
+  isReadOnly = false,
 }: {
   label: string;
   value: number;
   min: number;
   max: number;
   onChange: (value: number) => void;
+  isReadOnly?: boolean;
 }) {
   return (
     <Field label={label}>
@@ -920,7 +1081,8 @@ function Stepper({
         <button
           type="button"
           onClick={() => onChange(Math.max(min, value - 1))}
-          className="w-9 h-9 flex items-center justify-center border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+          disabled={isReadOnly}
+          className="w-9 h-9 flex items-center justify-center border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
         >
           −
         </button>
@@ -930,12 +1092,16 @@ function Stepper({
           onChange={(e) => onChange(Number(e.target.value))}
           min={min}
           max={max}
-          className="w-16 text-center px-2 py-2 border border-neutral-300 rounded-lg text-sm"
+          disabled={isReadOnly}
+          className={`w-16 text-center px-2 py-2 border border-neutral-300 rounded-lg text-sm ${
+            isReadOnly ? "bg-neutral-100 cursor-not-allowed" : ""
+          }`}
         />
         <button
           type="button"
           onClick={() => onChange(Math.min(max, value + 1))}
-          className="w-9 h-9 flex items-center justify-center border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer"
+          disabled={isReadOnly}
+          className="w-9 h-9 flex items-center justify-center border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
         >
           +
         </button>

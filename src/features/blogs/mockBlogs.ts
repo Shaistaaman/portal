@@ -1,4 +1,4 @@
-import type { Blog } from "./types";
+import type { Blog } from "../../types/blogs";
 
 /**
  * Mock blogs. Replace with a real API call once admin-fn exists (see

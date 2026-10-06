@@ -1,5 +1,5 @@
-import { PROPERTIES, nightlyRateFor } from "@/features/properties/properties";
-import type { Booking } from "./types";
+import { PROPERTIES } from "@/features/properties/properties";
+import type { Booking } from "../../types/calendar";
 
 /**
  * Mock bookings. Dates are generated relative to today so the calendar
@@ -256,24 +256,27 @@ const SEEDS: Seed[] = [
   },
 ];
 
-export const MOCK_BOOKINGS: Booking[] = SEEDS.map((seed) => ({
-  id: seed.id,
-  propertyId: seed.propertyId,
-  propertyName: propertyName(seed.propertyId),
-  bookingType: seed.bookingType,
-  status: seed.status,
-  checkIn: isoDate(seed.startOffset),
-  checkOut: isoDate(seed.startOffset + seed.nights),
-  guestName: seed.guestName,
-  guestPhone: seed.guestPhone,
-  guestEmail: seed.guestEmail,
-  adults: seed.adults,
-  children: seed.children,
-  maintenanceNote: seed.maintenanceNote ?? "",
-  nightlyRate: nightlyRateFor(seed.propertyId),
-  createdByRole: seed.createdByRole,
-  createdByName: seed.createdByName,
-}));
+export const MOCK_BOOKINGS: Booking[] = SEEDS.map((seed) => {
+  const property = PROPERTIES.find((p) => p.id === seed.propertyId);
+  return {
+    id: seed.id,
+    propertyId: seed.propertyId,
+    propertyName: propertyName(seed.propertyId),
+    bookingType: seed.bookingType,
+    status: seed.status,
+    checkIn: isoDate(seed.startOffset),
+    checkOut: isoDate(seed.startOffset + seed.nights),
+    guestName: seed.guestName,
+    guestPhone: seed.guestPhone,
+    guestEmail: seed.guestEmail,
+    adults: seed.adults,
+    children: seed.children,
+    maintenanceNote: seed.maintenanceNote ?? "",
+    nightlyRate: property?.nightlyRate ?? 900,
+    createdByRole: seed.createdByRole,
+    createdByName: seed.createdByName,
+  };
+});
 
 export function findMockBookingById(id: string): Booking | undefined {
   return MOCK_BOOKINGS.find((b) => b.id === id);

@@ -5,7 +5,7 @@ import {
   createHighlightBlock,
   type PackageFormValues,
   type PackageHighlightBlock,
-} from "./types";
+} from "../../types/packages";
 
 type WizardStep = "identity" | "imagery" | "details";
 

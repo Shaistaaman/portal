@@ -8,7 +8,7 @@ import {
   timeToMinutes,
   type ExperienceCategory,
   type ExperienceFormValues,
-} from "./types";
+} from "../../types/experiences";
 
 type WizardStep = "identity" | "imagery" | "details";
 

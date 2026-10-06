@@ -23,7 +23,7 @@ import {
   nightsBetween,
   type Booking,
   type BookingStatus,
-} from "./types";
+} from "../../types/calendar";
 
 const ITEMS_PER_PAGE = 5;
 

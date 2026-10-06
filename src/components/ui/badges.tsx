@@ -1,5 +1,5 @@
 import type { UserRole } from "@/types/auth";
-import type { ManagedUserStatus } from "@/features/user-management/types";
+import type { ManagedUserStatus } from "@/types/user-management";
 
 const ROLE_STYLES: Record<UserRole, string> = {
   admin: "bg-purple-50 text-purple-700",

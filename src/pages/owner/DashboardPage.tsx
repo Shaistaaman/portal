@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, Calendar } from "lucide-react";
 import { PROPERTIES } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
-import { bookingNumbers, type Booking } from "@/features/calendar/types";
+import { bookingNumbers, type Booking } from "@/types/calendar";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
 /**
@@ -180,6 +180,31 @@ export default function OwnerDashboardPage() {
           Add Property
         </button>
       </div>
+
+      {/* Pending Edits Alert */}
+      {ownedProperties.some((p) => p.status === "in_review") && (
+        <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-yellow-800">
+                ⚠️ You have{" "}
+                {ownedProperties.filter((p) => p.status === "in_review").length}{" "}
+                property/properties with pending edits
+              </p>
+              <p className="text-xs text-yellow-700 mt-1">
+                Your edits are awaiting admin review. The properties remain
+                visible on the public site.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate("/owner/properties")}
+              className="ml-4 text-sm font-medium text-yellow-700 hover:text-yellow-900 underline whitespace-nowrap"
+            >
+              View Properties →
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-5 mb-8">

@@ -13,10 +13,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import {
-  findPropertyById,
-  NIGHTLY_RATES,
-} from "@/features/properties/properties";
+import { findPropertyById } from "@/features/properties/properties";
 import { generateBrochurePdf } from "../../utils/generateBrochurePdf";
 
 /** Calendar starts at July 2026 and can advance 10 months. */
@@ -65,10 +62,10 @@ export default function PropertyDetailPage() {
       guests: Math.ceil(baseProperty.bedrooms * 1.5), // Estimate guests
       size: `${baseProperty.areaSqm}sqm`,
       images: baseProperty.images,
-      pricePerNight: NIGHTLY_RATES[baseProperty.id] ?? 900,
+      pricePerNight: baseProperty.nightlyRate ?? 900,
       cleaningFee: baseProperty.cleaningFee || 150,
       serviceFee: baseProperty.serviceFee || 75,
-      taxes: Math.round((NIGHTLY_RATES[baseProperty.id] ?? 900) * 0.1), // 10% tax
+      taxes: Math.round((baseProperty.nightlyRate ?? 900) * 0.1), // 10% tax
       description: baseProperty.description,
       insideDetails:
         baseProperty.amenities.join(", ") || "Luxury amenities throughout.",
@@ -382,7 +379,8 @@ export default function PropertyDetailPage() {
                       <img
                         src={img}
                         alt={`${property.title} preview ${idx + 1}`}
-                        loading="lazy"
+                        loading="eager"
+                        decoding="async"
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                       />
                       {isLast && (

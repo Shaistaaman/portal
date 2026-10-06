@@ -59,6 +59,7 @@ import ClientLayout from "@/layouts/ClientLayout";
 import ClientDashboardPage from "@/pages/client/DashboardPage";
 import ClientBookingsPage from "@/pages/client/BookingsPage";
 import ClientWishlistPage from "@/pages/client/WishlistPage";
+import AgentWishlistPage from "@/pages/agent/WishlistPage";
 import SharedExperienceDetailPage from "@/pages/shared/ExperienceDetailPage";
 import ClientSettingsPage from "@/pages/client/SettingsPage";
 
@@ -183,7 +184,7 @@ function App() {
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AgentDashboardPage />} />
-            <Route path="wishlist" element={<ClientWishlistPage />} />
+            <Route path="wishlist" element={<AgentWishlistPage />} />
             <Route
               path="experience/:experienceId"
               element={<SharedExperienceDetailPage />}

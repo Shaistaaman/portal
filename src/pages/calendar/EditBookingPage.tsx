@@ -9,7 +9,7 @@ import {
   BOOKING_STATUS_COLORS,
   BOOKING_STATUS_LABELS,
   type BookingStatus,
-} from "@/features/calendar/types";
+} from "@/types/calendar";
 import {
   allowedTransitions,
   canEditBooking,

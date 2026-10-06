@@ -1,5 +1,5 @@
 import { MOCK_USERS } from "@/features/user-management/mockUsers";
-import type { TagOption } from "./types";
+import type { TagOption } from "../../types/financials";
 
 /**
  * Owner/agent options for the "Tag to" selector, sourced from the shared

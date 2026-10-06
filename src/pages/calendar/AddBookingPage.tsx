@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import BookingForm from "@/features/calendar/BookingForm";
-import { BOOKING_CREATION_STATUS } from "@/features/calendar/types";
-import type { Booking } from "@/features/calendar/types";
+import { BOOKING_CREATION_STATUS } from "@/types/calendar";
+import type { Booking } from "@/types/calendar";
 import type { UserRole } from "@/types/auth";
 import { useAuth } from "@/auth/useAuth";
 

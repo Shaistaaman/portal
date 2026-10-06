@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
 import { isAgentProfileComplete } from "@/features/agent/agentProfileState";
-import { bookingNumbers, type Booking } from "@/features/calendar/types";
+import { bookingNumbers, type Booking } from "@/types/calendar";
 import PropertySearch, {
   type Guests,
 } from "@/components/search/PropertySearch";

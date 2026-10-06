@@ -1,4 +1,4 @@
-import type { Experience } from "./types";
+import type { Experience } from "../../types/experiences";
 
 /**
  * Mock experiences catalogue. Replace with a real API call once admin-fn

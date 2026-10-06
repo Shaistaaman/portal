@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { MOCK_BLOGS } from "./mockBlogs";
-import type { Blog, BlogStatus } from "./types";
+import type { Blog, BlogStatus } from "../../types/blogs";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -56,7 +56,10 @@ export default function BlogList() {
     visibleBlogs.find((b) => b.id === selectedId) ?? visibleBlogs[0];
 
   const [page, setPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil(visibleBlogs.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(visibleBlogs.length / ITEMS_PER_PAGE),
+  );
   const paginatedBlogs = visibleBlogs.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE,
@@ -243,7 +246,9 @@ export default function BlogList() {
                     }}
                     className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
                   >
-                    {selectedBlog.status === "active" ? "Deactivate" : "Activate"}
+                    {selectedBlog.status === "active"
+                      ? "Deactivate"
+                      : "Activate"}
                   </button>
                 </div>
               </>

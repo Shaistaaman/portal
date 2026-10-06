@@ -6,15 +6,14 @@ import {
   NOTIFICATION_ACTION_COLORS,
   NOTIFICATION_ACTION_LABELS,
   type Notification,
-} from "./types";
+} from "../../types/notifications";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function NotificationsList() {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<Notification[]>(
-    MOCK_NOTIFICATIONS,
-  );
+  const [notifications, setNotifications] =
+    useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [page, setPage] = useState(1);
   const [showUnread, setShowUnread] = useState(false);
 

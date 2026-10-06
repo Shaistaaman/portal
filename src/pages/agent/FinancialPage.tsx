@@ -16,7 +16,7 @@ import {
   formatPeriod,
   type FinancialCategory,
   type FinancialRecord,
-} from "@/features/financials/types";
+} from "@/types/financials";
 
 const ITEMS_PER_PAGE = 8;
 

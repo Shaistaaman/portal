@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import AddPropertyWizard from "@/features/properties/AddPropertyWizard";
-import { PROPERTY_CREATION_STATUS } from "@/features/properties/types";
+import { PROPERTY_CREATION_STATUS } from "@/types/properties";
 
 export default function OwnerAddPropertyPage() {
   const navigate = useNavigate();

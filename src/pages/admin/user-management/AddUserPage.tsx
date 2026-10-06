@@ -5,7 +5,7 @@ import {
   USER_CREATION_STATUS,
   type ManagedUserStatus,
   type UserFormValues,
-} from "@/features/user-management/types";
+} from "@/types/user-management";
 
 export default function AddUserPage() {
   const navigate = useNavigate();

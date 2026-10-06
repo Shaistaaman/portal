@@ -1,4 +1,4 @@
-import type { Package } from "./types";
+import type { Package } from "../../types/packages";
 
 /**
  * Mock packages catalogue. Replace with a real API call once admin-fn

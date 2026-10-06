@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { MOCK_EXPERIENCES } from "./mockExperiences";
-import type { Experience, ExperienceStatus } from "./types";
+import type { Experience, ExperienceStatus } from "../../types/experiences";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -330,8 +330,8 @@ export default function ExperienceList() {
         <img
           src={selectedExperience.images[0]}
           alt={selectedExperience.name}
-          className="w-full max-w-lg rounded-lg object-cover"
-          style={{ aspectRatio: "3/2" }}
+          className="w-full rounded-lg object-cover"
+          style={{ aspectRatio: "16/6" }}
         />
       </div>
 

@@ -5,7 +5,7 @@ import {
   FINANCIAL_CATEGORIES,
   MONTH_NAMES,
   type FinancialRecordFormValues,
-} from "./types";
+} from "../../types/financials";
 import { AGENT_TAG_OPTIONS, OWNER_TAG_OPTIONS } from "./tagOptions";
 
 const CURRENT_YEAR = new Date().getFullYear();

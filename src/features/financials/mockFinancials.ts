@@ -1,4 +1,4 @@
-import type { FinancialRecord } from "./types";
+import type { FinancialRecord } from "../../types/financials";
 
 /**
  * Mock financial records. Replace with a real API + S3-backed file store

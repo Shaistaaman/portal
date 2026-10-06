@@ -1,11 +1,16 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  MoreVertical,
+} from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { RoleBadge, StatusBadge } from "@/components/ui/badges";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { MOCK_USERS } from "@/features/user-management/mockUsers";
-import type { ManagedUser } from "@/features/user-management/types";
+import type { ManagedUser } from "@/types/user-management";
 import type { UserRole } from "@/types/auth";
 
 const ITEMS_PER_PAGE = 5;
@@ -104,9 +109,7 @@ export default function UserListPage() {
             <button
               key={filter.value}
               type="button"
-              onClick={() =>
-                changeFilter(() => setRoleFilter(filter.value))
-              }
+              onClick={() => changeFilter(() => setRoleFilter(filter.value))}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
                 roleFilter === filter.value
                   ? "bg-black text-white"
@@ -190,7 +193,10 @@ export default function UserListPage() {
                   <StatusBadge status={user.status} />
                 </td>
                 <td className="px-6 py-3 text-right">
-                  <div className="relative inline-block" ref={activeMenuId === user.id ? menuRef : undefined}>
+                  <div
+                    className="relative inline-block"
+                    ref={activeMenuId === user.id ? menuRef : undefined}
+                  >
                     <button
                       type="button"
                       onClick={() =>

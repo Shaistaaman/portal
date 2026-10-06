@@ -1,4 +1,4 @@
-import type { Notification } from "./types";
+import type { Notification } from "../../types/notifications";
 
 /**
  * Mock notifications reflecting system events: property onboarding, bookings,

@@ -1,4 +1,4 @@
-import type { ManagedUser } from "./types";
+import type { ManagedUser } from "../../types/user-management";
 
 /**
  * Single shared mock dataset for User Management, used by both the list

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { PROPERTIES } from "./properties";
-import type { Property, PropertyStatus } from "./types";
+import type { Property, PropertyStatus } from "../../types/properties";
 
 export type PropertyListRole = "admin" | "owner" | "agent";
 
@@ -65,6 +65,75 @@ function FeaturedBadge() {
       <Star className="w-3 h-3 fill-current" />
       Featured
     </span>
+  );
+}
+
+/**
+ * Pending revision badge (shows when property has draft/in_review/rejected revision)
+ * AWS TODO: Wire to pending badge display in property list rows
+ * @internal - Used for future UI wiring
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface PendingBadgeProps {
+  revisionNo: number;
+  status: "draft" | "in_review" | "rejected";
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function PendingBadge({ revisionNo, status }: PendingBadgeProps) {
+  const statusStyles: Record<typeof status, string> = {
+    draft: "bg-gray-100 text-gray-800",
+    in_review: "bg-yellow-100 text-yellow-800",
+    rejected: "bg-red-100 text-red-800",
+  };
+
+  const statusLabels: Record<typeof status, string> = {
+    draft: "Draft",
+    in_review: "Pending Review",
+    rejected: "Rejected",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}
+    >
+      [v{revisionNo} {statusLabels[status]}]
+    </span>
+  );
+}
+
+/**
+ * Version info display (current + pending)
+ * AWS TODO: Wire to version info display in property list rows
+ * @internal - Used for future UI wiring
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface VersionInfoProps {
+  currentRevisionNo: number;
+  pendingRevisionNo?: number;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function VersionInfo({
+  currentRevisionNo,
+  pendingRevisionNo,
+}: VersionInfoProps) {
+  if (!pendingRevisionNo) {
+    return (
+      <span className="text-xs text-neutral-500">
+        v{currentRevisionNo} (live)
+      </span>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="text-neutral-500">v{currentRevisionNo} (live)</span>
+      <span className="text-neutral-300">→</span>
+      <span className="text-yellow-600 font-medium">
+        v{pendingRevisionNo} pending
+      </span>
+    </div>
   );
 }
 
@@ -469,8 +538,8 @@ export default function PropertyList({ role }: { role: PropertyListRole }) {
         <img
           src={selectedProperty.images[0]}
           alt={selectedProperty.name}
-          className="w-full max-w-lg rounded-lg object-cover mb-6"
-          style={{ aspectRatio: "3/2" }}
+          className="w-full rounded-lg object-cover mb-6"
+          style={{ aspectRatio: "16/6" }}
         />
 
         {selectedProperty.status === "rejected" &&

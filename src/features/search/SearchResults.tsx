@@ -9,9 +9,9 @@ import {
   Users,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { PROPERTIES, nightlyRateFor } from "@/features/properties/properties";
+import { PROPERTIES } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "@/features/calendar/mockBookings";
-import type { Property } from "@/features/properties/types";
+import type { Property } from "@/types/properties";
 import type { Guests } from "@/components/search/PropertySearch";
 import { useNavigate } from "react-router-dom";
 import { useRole } from "@/hooks/useRole";
@@ -133,7 +133,7 @@ export default function SearchResults({
       }
 
       // Price filter
-      const pricePerNight = nightlyRateFor(property.id);
+      const pricePerNight = property.nightlyRate ?? 900;
       const minVal = minPrice ? parseInt(minPrice) : 0;
       const maxVal = maxPrice ? parseInt(maxPrice) : Infinity;
       if (pricePerNight < minVal || pricePerNight > maxVal) {
@@ -277,7 +277,7 @@ export default function SearchResults({
               {/* Property Cards */}
               <div className="space-y-6 mb-8">
                 {paginatedProperties.map((property) => {
-                  const pricePerNight = nightlyRateFor(property.id);
+                  const pricePerNight = property.nightlyRate ?? 900;
                   const isLiked = likedProperties.has(property.id);
 
                   return (

@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useRole } from "../../hooks/useRole";
 import { MOCK_EXPERIENCES as SOURCE_EXPERIENCES } from "@/features/experiences/mockExperiences";
-import { EXPERIENCE_CATEGORIES } from "@/features/experiences/types";
+import { EXPERIENCE_CATEGORIES } from "@/types/experiences";
 
 /**
  * Card view of the shared experience catalogue. Ids match

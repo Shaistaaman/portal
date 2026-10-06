@@ -8,7 +8,7 @@ import {
   experienceSlots,
   formatDurationMinutes,
   type Experience,
-} from "@/features/experiences/types";
+} from "@/types/experiences";
 
 /**
  * Experience detail page for client and agent (portal), modeled on the
@@ -213,7 +213,8 @@ export default function ExperienceDetailPage() {
                       <img
                         src={img}
                         alt={`${experience.name} ${idx + 1}`}
-                        loading="lazy"
+                        loading="eager"
+                        decoding="async"
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     )}
@@ -225,7 +226,8 @@ export default function ExperienceDetailPage() {
                   <img
                     src={gallery[3]}
                     alt={`${experience.name} 3`}
-                    loading="lazy"
+                    loading="eager"
+                    decoding="async"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 )}

@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { PROPERTIES, nightlyRateFor } from "@/features/properties/properties";
+import { PROPERTIES } from "@/features/properties/properties";
 import { MOCK_BOOKINGS } from "./mockBookings";
 import {
   BOOKING_TYPE_LABELS,
@@ -9,7 +9,7 @@ import {
   nightsBetween,
   BOOKING_TYPES_BY_ROLE,
   type BookingFormValues,
-} from "./types";
+} from "../../types/calendar";
 import type { UserRole } from "@/types/auth";
 
 /** Demo-only owner scoping — same approach as PropertyList / Calendar. */
@@ -74,7 +74,7 @@ export default function BookingForm({
   ) => setValues((current) => ({ ...current, [key]: value }));
 
   const selectedProperty = properties.find((p) => p.id === values.propertyId);
-  const nightlyRate = nightlyRateFor(values.propertyId);
+  const nightlyRate = selectedProperty?.nightlyRate ?? 900;
 
   const nights = nightsBetween(values.checkIn, values.checkOut);
   const price = computePrice(nightlyRate, nights, DEFAULT_ORG_FEES);

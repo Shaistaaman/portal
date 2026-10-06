@@ -8,7 +8,7 @@ import {
   BOOKING_STATUS_LABELS,
   CALENDAR_LEGEND_STATUSES,
   type Booking,
-} from "./types";
+} from "../../types/calendar";
 
 export type CalendarRole = "admin" | "owner" | "agent";
 

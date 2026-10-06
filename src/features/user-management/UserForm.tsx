@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { Upload, X } from "lucide-react";
 import type { UserRole } from "@/types/auth";
-import { EMPTY_USER_FORM_VALUES, type UserFormValues } from "./types";
+import {
+  EMPTY_USER_FORM_VALUES,
+  type UserFormValues,
+} from "../../types/user-management";
 
 const ROLES: UserRole[] = ["admin", "client", "owner", "agent"];
 
