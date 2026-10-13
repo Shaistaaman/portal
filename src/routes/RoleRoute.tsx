@@ -1,14 +1,8 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/auth/useAuth";
+import { LOGIN_PATH_BY_ROLE, withQuery } from "@/auth/authPaths";
 import type { UserRole } from "@/types/auth";
-
-const LOGIN_PATH_BY_ROLE: Record<UserRole, string> = {
-  admin: "/admin/login",
-  agent: "/agent/login",
-  owner: "/owner/login",
-  client: "/login",
-};
 
 interface RoleRouteProps {
   allow: UserRole[];
@@ -20,22 +14,34 @@ interface RoleRouteProps {
  * corresponding login surface if there is no session, or if the
  * authenticated user's role is not in `allow`.
  *
- * TODO(AWS integration): `user.role` must come from a verified Cognito
- * group claim (decoded from the session's ID/access token), not from
- * client-writable state, before this check is meaningful for security.
- * Today's AuthContext is a demo mock — this guard is the enforcement
- * point that will matter once that's wired up.
+ * This is a UX convenience, not a security boundary: `user.role` is the
+ * display copy from `/v1/me`, and every protected API call is
+ * re-authorised server-side against the session's Cognito group.
  */
 export default function RoleRoute({ allow, children }: RoleRouteProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+
+  if (isLoading) {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="min-h-screen flex items-center justify-center bg-[#fcfbf9] text-sm text-neutral-500"
+      >
+        Checking your session…
+      </div>
+    );
+  }
 
   if (!isAuthenticated || !user) {
     const primaryRole = allow[0];
-    const fallback = primaryRole ? LOGIN_PATH_BY_ROLE[primaryRole] : "/login";
+    const loginPath = primaryRole ? LOGIN_PATH_BY_ROLE[primaryRole] : "/login";
     return (
       <Navigate
-        to={`${fallback}?redirect=${encodeURIComponent(location.pathname)}`}
+        to={withQuery(loginPath, {
+          redirect: location.pathname + location.search,
+        })}
         replace
       />
     );

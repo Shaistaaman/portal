@@ -1,57 +1,73 @@
-import { useState, type ReactNode } from "react";
-import type { SignupInput, User, UserRole } from "@/types/auth";
-import { AuthContext, DEMO_ADMIN, type AuthContextValue } from "./auth-context";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import type { LoginResult, User } from "@/types/auth";
+import { authApi, isMockAuth } from "./authApi";
+import { AuthContext, type AuthContextValue } from "./auth-context";
 
 /**
- * TODO(AWS integration): replace this demo-only provider with one backed by
- * Amazon Cognito (see `lib/aws/cognito.ts` once added) and a persisted
- * session (httpOnly cookie or secure storage), instead of in-memory state
- * that resets on refresh and accepts any password.
+ * Session state for the portal.
+ *
+ * Tokens are never held here. In live mode the backend keeps them and the
+ * browser carries an HttpOnly session cookie (backend-config.md §10.1);
+ * this provider only stores the display copy of the user returned by
+ * `/v1/me` or a successful login. Route guards built on it are UX only —
+ * every API call is re-authorised server-side.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(DEMO_ADMIN);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const loginAsDemo = (role: UserRole = "admin") => {
-    setUser({ ...DEMO_ADMIN, role });
-  };
-
-  const login: AuthContextValue["login"] = (
-    _email,
-    _password,
-    role = "admin",
-  ) => {
-    const loggedInUser: User = { ...DEMO_ADMIN, role };
-    setUser(loggedInUser);
-    return { success: true, user: loggedInUser };
-  };
-
-  const signup = (data: SignupInput) => {
-    const newUser: User = {
-      ...DEMO_ADMIN,
-      name: `${data.firstName} ${data.lastName}`.trim() || "Demo User",
-      email: data.email || "demo@skylife.com",
-      role: data.role || "client",
+  // Restore an existing session (cookie) on first load.
+  useEffect(() => {
+    let cancelled = false;
+    authApi
+      .me()
+      .then((current) => {
+        if (!cancelled) setUser(current);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
     };
-    setUser(newUser);
-    return { success: true, user: newUser };
-  };
+  }, []);
 
-  const logout = () => {
+  const applyLogin = useCallback((result: LoginResult) => {
+    if (result.status === "ok") setUser(result.user);
+    return result;
+  }, []);
+
+  const logout = useCallback(async () => {
     setUser(null);
-  };
+    await authApi.logout();
+  }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        loginAsDemo,
-        login,
-        signup,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      isAuthenticated: !!user,
+      isLoading,
+      isMockAuth,
+      login: async (email, password, portal) =>
+        applyLogin(await authApi.login(email, password, portal)),
+      completeNewPassword: async (newPassword, portal) =>
+        applyLogin(await authApi.completeNewPassword(newPassword, portal)),
+      signup: (data) => authApi.signup(data),
+      confirmSignup: (email, code) => authApi.confirmSignup(email, code),
+      resendSignupCode: (email) => authApi.resendSignupCode(email),
+      forgotPassword: (email) => authApi.forgotPassword(email),
+      resetPassword: (email, code, newPassword) =>
+        authApi.resetPassword(email, code, newPassword),
+      logout,
+    }),
+    [user, isLoading, applyLogin, logout],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

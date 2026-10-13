@@ -1,22 +1,46 @@
 import { createContext } from "react";
-import type { AuthResult, SignupInput, User, UserRole } from "@/types/auth";
+import type {
+  ActionResult,
+  LoginResult,
+  SignupInput,
+  SignupResult,
+  User,
+  UserRole,
+} from "@/types/auth";
 
 export interface AuthContextValue {
+  /** Display-only copy of the session user from `/v1/me`. The server enforces permissions. */
   user: User | null;
   isAuthenticated: boolean;
-  /** Demo-only: sets the current user to a given role without validating credentials. */
-  loginAsDemo: (role?: UserRole) => void;
+  /** True while the initial session check is in flight. */
+  isLoading: boolean;
+  /** True when running without a backend (VITE_API_BASE_URL unset). */
+  isMockAuth: boolean;
   /**
-   * Demo-only: does not validate the password against a backend. `role`
-   * is the role of the login surface the caller is on (e.g. `/agent/login`
-   * passes "agent") — a stand-in for the Cognito group claim a real
-   * sign-in response would carry. It is supplied by the page, never by
-   * the visitor, so it does not reintroduce a role picker.
+   * `portal` is the role of the login surface the caller is on (e.g.
+   * `/agent/login` passes "agent"). It is supplied by the page, never by
+   * the visitor, and the server rejects it if it doesn't match the
+   * account's Cognito group.
    */
-  login: (email: string, password?: string, role?: UserRole) => AuthResult;
-  /** Demo-only: does not persist the new user anywhere. */
-  signup: (data: SignupInput) => AuthResult;
-  logout: () => void;
+  login: (
+    email: string,
+    password: string,
+    portal: UserRole,
+  ) => Promise<LoginResult>;
+  completeNewPassword: (
+    newPassword: string,
+    portal: UserRole,
+  ) => Promise<LoginResult>;
+  signup: (data: SignupInput) => Promise<SignupResult>;
+  confirmSignup: (email: string, code: string) => Promise<ActionResult>;
+  resendSignupCode: (email: string) => Promise<ActionResult>;
+  forgotPassword: (email: string) => Promise<ActionResult>;
+  resetPassword: (
+    email: string,
+    code: string,
+    newPassword: string,
+  ) => Promise<ActionResult>;
+  logout: () => Promise<void>;
 }
 
 export const DEMO_ADMIN: User = {
@@ -33,11 +57,23 @@ export const DEMO_ADMIN: User = {
   createdAt: "2024-01-15T08:00:00Z",
 };
 
+const NO_PROVIDER = {
+  status: "error",
+  code: "no_provider",
+  message: "AuthProvider is missing.",
+} as const;
+
 export const AuthContext = createContext<AuthContextValue>({
-  user: DEMO_ADMIN,
-  isAuthenticated: true,
-  loginAsDemo: () => {},
-  login: () => ({ success: true, user: DEMO_ADMIN }),
-  signup: () => ({ success: true, user: DEMO_ADMIN }),
-  logout: () => {},
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  isMockAuth: true,
+  login: async () => NO_PROVIDER,
+  completeNewPassword: async () => NO_PROVIDER,
+  signup: async () => NO_PROVIDER,
+  confirmSignup: async () => NO_PROVIDER,
+  resendSignupCode: async () => NO_PROVIDER,
+  forgotPassword: async () => NO_PROVIDER,
+  resetPassword: async () => NO_PROVIDER,
+  logout: async () => {},
 });

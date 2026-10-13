@@ -2,6 +2,9 @@ import { Navigate, Route, BrowserRouter, Routes } from "react-router-dom";
 import { AuthProvider } from "@/auth/AuthContext";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
+import ConfirmSignupPage from "@/pages/auth/ConfirmSignupPage";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
+import SetNewPasswordPage from "@/pages/auth/SetNewPasswordPage";
 import AdminLoginPage from "@/pages/auth/AdminLoginPage";
 import AgentLoginPage from "@/pages/auth/AgentLoginPage";
 import OwnerLoginPage from "@/pages/auth/OwnerLoginPage";
@@ -73,6 +76,11 @@ function App() {
           {/* Client-facing (reached via marketing CTAs) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+
+          {/* Auth follow-up steps, shared by all roles */}
+          <Route path="/confirm-signup" element={<ConfirmSignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/set-password" element={<SetNewPasswordPage />} />
           <Route
             path="/client"
             element={

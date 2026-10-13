@@ -1,55 +1,54 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import PublicHeader from "@/components/layout/PublicHeader";
+import { Link, useSearchParams } from "react-router-dom";
 import LoginForm from "@/features/auth/LoginForm";
-import { useAuth } from "@/auth/useAuth";
-
-const DEFAULT_CLIENT_DASHBOARD = "/client/dashboard";
+import { AuthPageLayout } from "@/features/auth/AuthCard";
+import { AUTH_LINK_CLASS } from "@/features/auth/authStyles";
+import { useLoginSubmit } from "@/features/auth/useLoginSubmit";
+import {
+  DASHBOARD_PATH_BY_ROLE,
+  noticeMessage,
+  safeRedirect,
+  withQuery,
+} from "@/auth/authPaths";
 
 /**
  * Client-facing login, reached from marketing CTAs (e.g. "Book Your Stay",
  * "Request an Experience"). The role is always "client" here — there is no
  * role picker. `redirect` carries the visitor's *intent* from the marketing
- * site (e.g. the booking flow they came from), not their identity; the
- * actual role that grants access still comes from the authenticated
- * session, not from this query param.
+ * site, not their identity; the role that grants access comes from the
+ * server-side session.
  */
 export default function LoginPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login } = useAuth();
 
-  const redirectTo = searchParams.get("redirect") || DEFAULT_CLIENT_DASHBOARD;
-
-  const handleSubmit = (email: string, password: string) => {
-    // TODO(AWS integration): replace with a real Cognito sign-in call.
-    login(email, password, "client");
-    navigate(redirectTo);
-  };
+  const redirectTo = safeRedirect(
+    searchParams.get("redirect"),
+    DASHBOARD_PATH_BY_ROLE.client,
+  );
+  const { submit, isLoading, error } = useLoginSubmit("client", redirectTo);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <PublicHeader />
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 bg-[#fcfbf9]">
-        <LoginForm
-          role="client"
-          heading="Login to the Premium Traveler Experience"
-          onSubmit={handleSubmit}
-          footer={
-            <>
-              Don&apos;t have an account?{" "}
-              <button
-                type="button"
-                onClick={() =>
-                  navigate(`/signup?redirect=${encodeURIComponent(redirectTo)}`)
-                }
-                className="font-semibold text-neutral-950 underline hover:text-black cursor-pointer"
-              >
-                Sign up now
-              </button>
-            </>
-          }
-        />
-      </div>
-    </div>
+    <AuthPageLayout>
+      <LoginForm
+        role="client"
+        heading="Login to the Premium Traveler Experience"
+        onSubmit={submit}
+        isLoading={isLoading}
+        error={error}
+        notice={noticeMessage(searchParams.get("notice"))}
+        forgotPasswordHref={withQuery("/forgot-password", { role: "client" })}
+        defaultEmail={searchParams.get("email") ?? ""}
+        footer={
+          <>
+            Don&apos;t have an account?{" "}
+            <Link
+              to={withQuery("/signup", { redirect: redirectTo })}
+              className={AUTH_LINK_CLASS}
+            >
+              Sign up now
+            </Link>
+          </>
+        }
+      />
+    </AuthPageLayout>
   );
 }
